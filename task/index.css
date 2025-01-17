@@ -1,0 +1,16 @@
+th {
+    border: 1px solid black;
+    font-size: 18px;
+}
+
+td {
+    padding-left: 5px;
+    padding-right: 10px;
+    border: 1px solid black;
+    font-size: 16px;
+}
+
+caption {
+    font-size: 20px;
+    padding-bottom: 10px;
+}

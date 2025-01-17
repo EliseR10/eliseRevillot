@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="author" content="">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-sclae1">
+
+        <!--<link href="favicon.ico" rel="icon">>-->
+        <link rel="stylesheet" type="text/css" href="index.css">
+        <title>API</title>
+    </head>
+    <body>
+        <table>
+            <caption>API Table</caption>
+            <tr>
+                <th>API Name</th>
+                <th>API Description</th>
+                <th></th>
+            </tr>
+
+            <tr>
+                <td>1. Neighbours</td>
+                <td>
+                    <p>Returns all neighbours for a country or administrative division.</p>
+                    <label for="country">Choose a country:</label>
+                    <select id="country">
+                        <option value="FR">France</option>
+                        <option value="DE">Germany</option>
+                        <option value="PL">Poland</option>
+                        <option value="BG">Bulgaria</option>
+                        <option value="KE">Kenya</option>
+                    </select>
+                </td>
+                <td><button type="button" id="NeighboursBtn">Submit</button></td>
+            </tr>
+                
+            <tr>
+                <td>2. Siblings</td>
+                <td>
+                    <p>Returns all siblings of a GeoNames toponym with feature class A. </p>
+                    <label for="geonameId">Choose a Geoname Id:</label>
+                    <select id="geonameId">
+                        <option value="3469034">3469034</option> <!--Brazil-->
+                        <option value="192950">192950</option>  <!--Kenya-->
+                        <option value="798544">798544</option> <!--Poland-->
+                        <option value="2635167">2635167</option> <!--United Kingdom-->
+                        <option value="3895114">3895114</option> <!--Chile-->
+                    </select>
+                </td>
+                <td><button type="button" id="SiblingsBtn">Submit</button></td>
+            </tr>
+
+            <tr>
+                <td>3. Hierarchy</td>
+                <td>
+                    <p>Returns all GeoNames higher up in the hierarchy of a place name.</p>
+                    <label for="geonameidHierarchy">Choose a Geoname Id:</label>
+                    <select id="geonameidHierarchy">
+                        <option value="3469034">3469034</option> <!--Paris-->
+                        <option value="192950">192950</option>  <!--Kenya-->
+                        <option value="798544">798544</option> <!--Poland-->
+                        <option value="2635167">2635167</option> <!--United Kingdom-->
+                        <option value="3895114">3895114</option> <!--Chile-->
+                    </select>
+                </td>
+                <td><button type="button" id="HierarchyBtn">Submit</button></td>
+            </tr>
+
+            <tr>
+                <td colspan="3" rowspan="5">
+                    <h2>Results:</h2>
+                    <div id="NeighboursResult">
+                        <h4>Neighbours of the chosen country:</h4>
+                        <p id="resultNeighbours"></p>
+                    </div>
+                    <div id="SiblingsResult">
+                        <h4>Siblings of the chosen country:</h4>
+                        <h5><b>ASCII Name:</b> <span id="asciiName"></span></h5>
+                        <h5><b>Country Code:</b> <span id="countryCode"></span></h5>
+                        <h5><b>Population:</b> <span id="population"></span></h5>
+                    </div>
+                    <div id="HierarchyResult">
+                        <h4>Hierarchy of the chosen country:</h4>
+                        <h5><b>ASCII Name:</b> <span id="asciiNameH"></span></h5>
+                        <h5><b>Country Latitude:</b> <span id="lat"></span></h5>
+                        <h5><b>Contry Longitude:</b> <span id="lng"></span></h5>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <script src="./jquery-3.7.1.js"></script>
+        <script src="./script.js"></script>
+    </body>
+</html>
