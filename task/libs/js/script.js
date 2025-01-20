@@ -4,7 +4,7 @@ $(document).ready(function () {
 $('#NeighboursBtn').click(function() {  
 
     $.ajax({
-        url: "http://localhost/task/getCountry.php",
+        url: "libs/php/getCountry.php",
         type: 'POST',
         dataType: 'json',
         data: { 
@@ -32,7 +32,7 @@ $('#NeighboursBtn').click(function() {
 $('#SiblingsBtn').click(function() {
 
     $.ajax({
-        url: "http://localhost/task/getGeonameId.php",
+        url: "libs/php/getGeonameId.php",
         type: 'POST',
         dataType: 'json',
         data: { 
@@ -65,7 +65,7 @@ $('#SiblingsBtn').click(function() {
 $('#HierarchyBtn').click(function() {
     
     $.ajax({
-        url: "http://localhost/task/getHierarchy.php",
+        url: "libs/php/getHierarchy.php",
         type: 'POST',
         dataType: 'json',
         data: { 
