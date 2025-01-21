@@ -1,0 +1,32 @@
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+#country {
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #51B4BF;
+    border-radius: 4px;
+    background-color: white;
+    color: #333;
+    cursor: pointer;   
+}
+
+#loading {
+    display: none;
+}
+
+#map {
+    height: 100vh;
+    width: 100%;
+    border: 1px solid black;
+    z-index: 0;
+}
+
+#mapBtn {
+    width: 40px; /*Increase width*/
+    height: 40px; /*Increase height*/
+    font-size: 1.5rem; /*Increase icon size*/
+}
