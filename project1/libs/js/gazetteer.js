@@ -1,3 +1,5 @@
+$(document).ready(function () {
+
 /*MAP*/
 //Initialize the map and set its view to show the entire world
 const map = L.map('map').setView([0, 0], 2);
@@ -103,7 +105,65 @@ L.easyButton({
         icon: 'fas fa-temperature-low',
         title: 'Weather Information',
         onClick: function() {
-            alert("This button will show information about a the weather in the chosen country.");
+            //Get latitude and longitude from the chosen country
+            const selectedCountry = $('#country').val();
+
+            if (selectedCountry) {
+                $.ajax({
+                    url: "http://127.0.0.1:5500/project1/libs/json/countries.json",
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(result) {
+                        console.log('Selected country: ', selectedCountry);
+                        const selectedCountryData = result.find(country => country.code === selectedCountry);
+                        console.log('Selected country data: ', selectedCountryData);
+
+                        if (selectedCountryData) {
+                            console.log(selectedCountryData);
+                        } else {
+                            console.log('Country not found in the list.')
+                        }
+                        
+                        //Now get the weather data
+                        $.ajax({
+                            url: "http://localhost/itcareerswitch/project1/libs/php/weather.php",
+                            type: 'GET',
+                            dataType: 'json',
+                            data: {
+                                latitude: selectedCountryData.latitude,
+                                longitude: selectedCountryData.longitude,
+                            },
+                            success: function(result) {
+                                console.log(JSON.stringify(result));
+                
+                                if (result.status.name === "ok") {
+                                    //SweetAlert2 popup
+                                    Swal.fire({
+                                        title: `Weather in ${result.data.location}`,
+                                        html: `
+                                            <p><strong>Temperature:</strong> ${result.data.temperature} K</p>
+                                            <p><strong>Description:</strong> ${result.data.description}</p>
+                                            <p><strong>Wind Speed:</strong> ${result.data.wind_speed} m/s</p>
+                                        `,
+                                        icon: 'info'
+                                    });
+
+                                } else {
+                                    Swal.fire({
+                                        title: 'Error',
+                                        text: result.status.description,
+                                        icon: 'error'
+                                    });
+                                }
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                console.error(textStatus, errorThrown, jqXHR.responseText);
+                                $().html("Error, unable to fetch data.");
+                            }
+                        });
+                    }
+                });
+            }   
         }
     }]
 }).addTo(map);
@@ -143,3 +203,5 @@ L.easyButton({
         }
     }]
 }).addTo(map);
+
+})
