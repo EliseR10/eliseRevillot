@@ -73,14 +73,4 @@
 	
 	header('Content-Type: application/json; charset=UTF-8'); 
 	echo json_encode($output);
-
-    /*No more than one call in 10 minutes for each location*/
-
-    /*only api endpoint to use for free api.openweathermap.org*/
-
-    /*Query by city and country code:https://api.openweathermap.org/data/2.5/weather?q=Tirana,AL&appid=YOUR_API_KEY*/
-
-    /*Query by coordinate: https://api.openweathermap.org/data/2.5/weather?lat=41.3275&lon=19.8189&appid=YOUR_API_KEY*/
-    /*Find by country code*/
-
 ?>

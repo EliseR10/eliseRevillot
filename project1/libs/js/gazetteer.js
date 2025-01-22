@@ -90,10 +90,70 @@ L.easyButton({
     id: "mapBtn",
     position: "bottomleft",
     states: [{
-        icon: 'fas fa-circle-info',
-        title: 'Country Information',
+        icon: 'fas fa-flag',
+        title: 'Flag',
         onClick: function() {
-            alert("This button will show information about a country.");
+            const selectedCountry = $('#country').val();
+
+            if (selectedCountry) {
+                $.ajax({
+                    url: "http://localhost/itcareerswitch/project1/libs/php/flag.php",
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        country: selectedCountry
+                    },
+                    success: function(result) {
+                        console.log('Selected country: ', selectedCountry);
+
+                        if (result.status.name === "ok") {
+                            //SweetAlert2 popup
+                            Swal.fire({
+                                title: `Flag of ${result.data.countryName}`,
+                                html: `
+                                    <img src="${result.data.flag}" alt="${selectedCountry} Flag"/>
+                                `,
+                                icon: 'info'
+                            });
+
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: result.status.description,
+                                icon: 'error'
+                            });
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error(textStatus, errorThrown, jqXHR.responseText);
+                            $().html("Error, unable to fetch data.");
+                    } 
+                });
+            }   
+        }
+    }]
+}).addTo(map);
+
+L.easyButton({
+    id: "mapBtn",
+    position: "bottomleft",
+    states: [{
+        icon: 'fas fa-link',
+        title: 'Wiki Links',
+        onClick: function() {
+            alert("This button will show information about links regarding the country.");
+        }
+    }]
+}).addTo(map);
+
+L.easyButton({
+    id: "mapBtn",
+    position: "bottomleft",
+    states: [{
+        icon: 'fas fa-money-bill-1',
+        title: 'Currency',
+        onClick: function() {
+            alert("This button will show information about currency and exchange in the chosen country.");
         }
     }]
 }).addTo(map);
@@ -172,34 +232,10 @@ L.easyButton({
     id: "mapBtn",
     position: "bottomleft",
     states: [{
-        icon: 'fas fa-link',
-        title: 'Wiki Links',
+        icon: 'fas fa-circle-info',
+        title: 'Country Information',
         onClick: function() {
-            alert("This button will show information about links regarding the country.");
-        }
-    }]
-}).addTo(map);
-
-L.easyButton({
-    id: "mapBtn",
-    position: "bottomleft",
-    states: [{
-        icon: 'fas fa-money-bill-1',
-        title: 'Currency',
-        onClick: function() {
-            alert("This button will show information about currency and exchange in the chosen country.");
-        }
-    }]
-}).addTo(map);
-
-L.easyButton({
-    id: "mapBtn",
-    position: "bottomleft",
-    states: [{
-        icon: 'fas fa-flag',
-        title: 'Flag',
-        onClick: function() {
-            alert("This button will show the country flag.");
+            alert("This button will show information about a country.");
         }
     }]
 }).addTo(map);

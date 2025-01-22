@@ -11,7 +11,8 @@ body {
     border-radius: 4px;
     background-color: white;
     color: #333;
-    cursor: pointer;   
+    cursor: pointer;
+    margin-right: 20px;   
 }
 
 #loading {
