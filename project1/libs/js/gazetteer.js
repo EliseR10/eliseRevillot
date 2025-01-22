@@ -139,9 +139,48 @@ L.easyButton({
     position: "bottomleft",
     states: [{
         icon: 'fas fa-link',
-        title: 'Wiki Links',
+        title: 'News',
         onClick: function() {
-            alert("This button will show information about links regarding the country.");
+            const selectedCountry = $('#country').val();
+
+            if (selectedCountry) {
+                $.ajax({
+                    url: "http://localhost/itcareerswitch/project1/libs/php/links.php",
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        country: selectedCountry
+                    },
+                    success: function(result) {
+                        console.log('Selected country: ', selectedCountry);
+
+                        if (result.status.name === "ok") {
+                            
+                            //SweetAlert2 popup
+                            Swal.fire({
+                                    title: `Headlines`,
+                                    html: `
+                                        <p><strong>Title:</strong> ${result.data.title}</p>
+                                        <p><strong>Description:</strong> ${result.data.description}</p>
+                                        <p><strong>Link to full article:</strong> ${result.data.url}</p>
+                                        <p><strong>Published on:</strong> ${result.data.publishedAt}</p>
+                                    `,
+                                    icon: 'info'
+                                });
+                        } else {
+                            Swal.fire({
+                                title: 'No articles found',
+                                text: 'No articles are available for the selected country.',
+                                icon: 'warning'
+                            });
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error(textStatus, errorThrown, jqXHR.responseText);
+                            $().html("Error, unable to fetch data.");
+                    } 
+                });
+            }   
         }
     }]
 }).addTo(map);
@@ -201,7 +240,7 @@ L.easyButton({
                                     Swal.fire({
                                         title: `Weather in ${result.data.location}`,
                                         html: `
-                                            <p><strong>Temperature:</strong> ${result.data.temperature} K</p>
+                                            <p><strong>Temperature:</strong> ${result.data.temperature} C</p>
                                             <p><strong>Description:</strong> ${result.data.description}</p>
                                             <p><strong>Wind Speed:</strong> ${result.data.wind_speed} m/s</p>
                                         `,
