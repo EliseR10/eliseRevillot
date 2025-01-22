@@ -26,20 +26,62 @@ map.on('load', function() {
     hideSpinner();
 });
 
-//Get country name from JSON file and display it in my options
-fetch('http://127.0.0.1:5500/project1/libs/scripts/countries.json')
-    .then(response => response.json())
-    .then(countries => {
-        const selectElement = document.getElementById('country');
+/*COUNTRY SELECTION*/
+$('#country').click(function() {  
+    const selectedCountry = $('#country').val();
 
-        countries.forEach(country => {
-            const option = document.createElement('option');
-            option.value = country.code;
-            option.textContent = country.name;
-            selectElement.appendChild(option);
-        });
-    })
-    .catch(error => console.error('Error loading countries: ', error));
+    if (selectedCountry) {
+    $.ajax({
+        url: "http://127.0.0.1:5500/project1/libs/json/countryBorders.geo.json",
+        type: 'GET',
+        dataType: 'json',
+        data: { 
+            country: selectedCountry
+        },
+        success: function(result) {
+            console.log(JSON.stringify(result));
+
+            const countryOptions = [];
+
+            result.features.forEach(function(country) {
+                countryOptions.push({
+                    name: country.properties.name,
+                    iso2: country.properties.iso_a2
+                });
+            });
+
+            countryOptions.sort(function(a, b) {
+                const nameA = a.name.toUpperCase(); // Convert to uppercase for case-insensitive sorting
+                const nameB = b.name.toUpperCase();
+                
+                if (nameA < nameB) {
+                    return -1;
+                }
+                if (nameA > nameB) {
+                    return 1;
+                }
+                    return 0;
+            });
+
+            console.log(countryOptions);
+
+            const countryDropdown = $('#country');
+            
+            countryOptions.forEach(function(option) {
+                const newOption = $('<option></option>')
+                    .val(option.iso2)
+                    .text(option.name);
+                    countryDropdown.append(newOption);
+            });
+        },
+        
+        error: function(xhr, status, error) {
+            console.error("Error loading country data:", error);
+                alert("Error loading country data.");
+        }
+    });
+}
+});
 
 /*EASY BUTTON MAP*/
 L.easyButton({
