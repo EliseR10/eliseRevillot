@@ -34,6 +34,7 @@
     
     $latitude = $_GET['latitude'] ?? null;
     $longitude = $_GET['longitude'] ?? null;
+    $units = 'metric';
 
     //Check that you have the valid necessary data for API
     if (!$latitude && !$longitude) {
@@ -48,7 +49,8 @@
         exit();
     }
 
-	$url = "https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=$API_KEY";
+    /*Precise units to get the Celsius otherwise Kelvin is the default*/
+	$url = "https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=$API_KEY" . "&units=" . $units;
 
     /*cURL request */
 	$ch = curl_init(); 

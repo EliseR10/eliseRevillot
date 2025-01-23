@@ -23,7 +23,7 @@
         exit;
     }
 
-    /*$url = "https://restcountries.com/v3.1/name/" . urlencode($country);*/
+    /*Link to use country code*/
     $url = "https://restcountries.com/v3.1/alpha/" . urlencode($country);
 
     /*cURL request */

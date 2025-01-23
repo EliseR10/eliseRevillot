@@ -29,60 +29,90 @@ map.on('load', function() {
 });
 
 /*COUNTRY SELECTION*/
-$('#country').click(function() {  
-    const selectedCountry = $('#country').val();
+//Populate the dropdown when the page loads
+$.ajax({
+    url: "http://127.0.0.1:5500/project1/libs/json/countryBorders.geo.json",
+    type: 'GET',
+    dataType: 'json',
+    success: function (result) {
+        const countryDropdown = $('#country'); //Dropdown element
+        const countryOptions = [];
+
+        //Get country names and ISO2 codes
+        result.features.forEach(function (country) {
+            countryOptions.push({
+                name: country.properties.name,
+                iso2: country.properties.iso_a2
+            });
+        });
+
+        //Sort countries alphabetically
+        countryOptions.sort(function (a, b) {
+            return a.name.localeCompare(b.name);
+        });
+
+        // Populate the dropdown
+        countryOptions.forEach(function (option) {
+            const newOption = $('<option></option>')
+                .val(option.iso2)
+                .text(option.name);
+            countryDropdown.append(newOption);
+        });
+    },
+    error: function (xhr, status, error) {
+        console.error("Error loading country data:", error);
+        alert("Error loading country data.");
+    }
+});
+
+//Handle dropdown change
+$('#country').change(function () {
+    const selectedCountry = $(this).val(); //Get selected ISO2 code
 
     if (selectedCountry) {
-    $.ajax({
-        url: "http://127.0.0.1:5500/project1/libs/json/countryBorders.geo.json",
-        type: 'GET',
-        dataType: 'json',
-        data: { 
-            country: selectedCountry
-        },
-        success: function(result) {
-            console.log(JSON.stringify(result));
+        // Fetch GeoJSON data again to find the selected country's geometry
+        $.ajax({
+            url: "http://127.0.0.1:5500/project1/libs/json/countryBorders.geo.json",
+            type: 'GET',
+            dataType: 'json',
+            success: function (result) {
+                // Find the selected country's feature in the GeoJSON
+                const selectedFeature = result.features.find(
+                    feature => feature.properties.iso_a2 === selectedCountry
+                );
 
-            const countryOptions = [];
+                if (selectedFeature) {
+                    //Clear existing layers from the map
+                    map.eachLayer(function (layer) {
+                        if (layer instanceof L.GeoJSON) {
+                            map.removeLayer(layer);
+                        }
+                    });
 
-            result.features.forEach(function(country) {
-                countryOptions.push({
-                    name: country.properties.name,
-                    iso2: country.properties.iso_a2
-                });
-            });
+                    // Add the selected country's borders to the map
+                    L.geoJSON(selectedFeature.geometry, {
+                        style: {
+                            color: "blue",    // Border color
+                            weight: 2,       // Border thickness
+                            fillColor: "lightblue", // Fill color
+                            fillOpacity: 0.4 // Transparency of the fill
+                        }
+                    }).addTo(map);
 
-            countryOptions.sort(function(a, b) {
-                const nameA = a.name.toUpperCase(); // Convert to uppercase for case-insensitive sorting
-                const nameB = b.name.toUpperCase();
-                
-                if (nameA < nameB) {
-                    return -1;
+                    /*ZOOM MAP*/
+                    const borders = L.geoJSON(selectedFeature.geometry).getBounds(); //Get country's bounds
+                    map.fitBounds(borders); //Zoom the map to the selected country's bounds
+
+                } else {
+                    alert("Country borders not found!");
                 }
-                if (nameA > nameB) {
-                    return 1;
-                }
-                    return 0;
-            });
-
-            console.log(countryOptions);
-
-            const countryDropdown = $('#country');
-            
-            countryOptions.forEach(function(option) {
-                const newOption = $('<option></option>')
-                    .val(option.iso2)
-                    .text(option.name);
-                    countryDropdown.append(newOption);
-            });
-        },
-        
-        error: function(xhr, status, error) {
-            console.error("Error loading country data:", error);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error loading country data:", error);
                 alert("Error loading country data.");
-        }
-    });
-}
+            }
+        });
+    }
 });
 
 /*EASY BUTTON MAP*/
