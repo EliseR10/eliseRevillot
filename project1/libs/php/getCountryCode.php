@@ -1,7 +1,8 @@
 <?php
-    header("Access-Control-Allow-Origin: *"); // Allow all origins
-    header("Access-Control-Allow-Methods: GET, POST, OPTIONS"); // Allow specific methods
-    header("Access-Control-Allow-Headers: Content-Type, Authorization, User-Agent"); // Allow specific headers
+    header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+    header("Access-Control-Allow-Headers: Content-Type, Authorization, User-Agent");
+    header('Content-Type: application/json; charset=UTF-8');
 
     ini_set('display_errors', 'On');
     error_reporting(E_ALL);
@@ -9,42 +10,47 @@
     $executionStartTime = microtime(true);
     
     //Input validation
-    $lat = isset($_GET['lat']) ? $_GET['lat'] : null;
-    $lng = isset($_GET['lng']) ? $_GET['lng'] : null;
-    $username = 'flightltd'; // Your Geonames username
+    $lat= $_GET['userLat'] ?? null;
+    $lng = $_GET['userLng'] ?? null;
 
-    if (!$lat && !$lng) {
+    if (empty($lat) || empty($lng)) {
         http_response_code(400);
         echo json_encode(["status" => ["code" => 400, "description" => "No coordinates given."]]);
         exit;
     }
-            
-    $url = "https://api.geonames.org/countryCodeJSON?lat=$lat&lng=$lng&username=$username";
+
+    $url = "https://api.geonames.org/countryCodeJSON?lat=$lat&lng=$lng&username=flightltd&style=full";
     
-   /*cURL request */
+    /*cURL request */
 	$ch = curl_init(); 
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_URL,$url); 
-	$result=curl_exec($ch); 
-	curl_close($ch);
+	$result=curl_exec($ch);  
 
-    $decode = json_decode($result,true); 
+    // Get HTTP response code
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
 
-    // Handle cURL errors or invalid API responses
     if ($result === false || $httpCode !== 200) {
+        // Log the cURL error for better debugging
+        error_log("cURL error: " . curl_error($ch));
+    
         http_response_code(500); // Internal Server Error
         echo json_encode([
             "status" => [
                 "code" => 500,
-                "description" => "Failed to retrieve data from Geonames API."
+                "description" => "Failed to retrieve data from GeoNames API. HTTP Code: $httpCode"
             ]
         ]);
         exit;
     }
 
-    // Validate API response
-    if (!$decode || !isset($decode[0])) {
+    $decode = json_decode($result,true);
+    
+
+    //Validate response
+    if (!$decode || !array_key_exists('countryCode', $decode)) {
         http_response_code(400);
         echo json_encode([
             "status" => [
@@ -65,6 +71,5 @@
         "countryName" => isset($decode['countryName']) ? $decode['countryName'] : null
     ];
 	
-	header('Content-Type: application/json; charset=UTF-8'); 
 	echo json_encode($output);
 ?>

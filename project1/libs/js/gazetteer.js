@@ -31,7 +31,6 @@ map.on('load', function() {
 
 /*USER LOCATION*/
 if (navigator.geolocation) {
-    console.log()
     navigator.geolocation.getCurrentPosition(success, error, { enableHighAccuracy: true });
 } else {
     console.error("Geolocation is not supported by this browser.");
@@ -40,19 +39,21 @@ if (navigator.geolocation) {
 function success(position) {
     const userLat = position.coords.latitude;
     const userLng = position.coords.longitude;
+    
+    console.log(userLat, userLng);
 
     //Reverse geocode to get the user's country
     $.ajax({
-        url: `http://127.0.0.1:5500/project1/libs/php/getCountryCode.php`,
+        url: `./libs/json/countries.json`,
         type: 'GET',
         dataType: 'json',
-        data: {
-            lat: userLat,
-            lng: userLng,
-        },
-        success: function (result) {
-            const userCountryCode = result.data.countryCode; // ISO2 country code
-            if (userCountryCode) {
+        success: function (countries) {
+            const closestCountry = getClosestCountry(userLat, userLng, countries); // ISO2 country code
+            
+            if (closestCountry) {
+                const userCountryCode = closestCountry.code;
+                console.log('User Country Code:', userCountryCode);
+
                 // Trigger the dropdown change to zoom to the user's country
                 $('#country').val(userCountryCode).trigger('change');
             }
@@ -65,6 +66,28 @@ function success(position) {
 
 function error(err) {
     console.warn(`ERROR(${err.code}): ${err.message}`);
+}
+
+function getClosestCountry(userLat, userLng, countries) {
+    // Loop through the countries to find the one with the closest match
+    for (let i = 0; i < countries.length; i++) {
+        const country = countries[i];
+        
+        // Check if the coordinates of the country are very close to the user's location
+        if (isCloseEnough(userLat, userLng, country.latitude, country.longitude)) {
+            return country;  // return the country that matches
+        }
+    }
+
+    return null; // No country found close enough
+}
+
+function isCloseEnough(userLat, userLng, countryLat, countryLng) {
+    // Allow a certain tolerance for matching coordinates (e.g., within 5 degrees)
+    const latTolerance = 5; // Can be adjusted based on your needs
+    const lngTolerance = 5;
+
+    return Math.abs(userLat - countryLat) <= latTolerance && Math.abs(userLng - countryLng) <= lngTolerance;
 }
 
 /*COUNTRY SELECTION*/
