@@ -43,11 +43,15 @@ function success(position) {
 
     //Reverse geocode to get the user's country
     $.ajax({
-        url: `http://api.geonames.org/countryCodeJSON?lat=${userLat}&lng=${userLng}&username=flightltd`,
+        url: `http://127.0.0.1:5500/project1/libs/php/getCountryCode.php`,
         type: 'GET',
         dataType: 'json',
+        data: {
+            lat: userLat,
+            lng: userLng,
+        },
         success: function (result) {
-            const userCountryCode = result.countryCode; // ISO2 country code
+            const userCountryCode = result.data.countryCode; // ISO2 country code
             if (userCountryCode) {
                 // Trigger the dropdown change to zoom to the user's country
                 $('#country').val(userCountryCode).trigger('change');
