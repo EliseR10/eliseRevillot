@@ -192,7 +192,46 @@ L.easyButton({
         icon: 'fas fa-money-bill-1',
         title: 'Currency',
         onClick: function() {
-            alert("This button will show information about currency and exchange in the chosen country.");
+            const selectedCountry = $('#country').val();
+
+            if (selectedCountry) {
+                $.ajax({
+                    url: "http://localhost/itcareerswitch/project1/libs/php/currency.php",
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        country: selectedCountry
+                    },
+                    success: function(result) {
+                        console.log('Selected country: ', selectedCountry);
+
+                        if (result.status.name === "ok") {
+                            //SweetAlert2 popup
+                            Swal.fire({
+                                title: `${result.data.currencyName}`,
+                                
+                                html: `
+                                    <p><strong>Currency:</strong> ${result.data.currencyCode}</p>
+                                    <p><strong>Currency Symbole:</strong> ${result.data.currencySymbole}</p>
+                                    <p><strong>Currency Exchange</strong> £1 = ${result.data.exchangeRate}${result.data.currencySymbole}</p>
+                                `,
+                                icon: 'info'
+                            });
+
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: result.status.description,
+                                icon: 'error'
+                            });
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error(textStatus, errorThrown, jqXHR.responseText);
+                            $().html("Error, unable to fetch data.");
+                    } 
+                });
+            }   
         }
     }]
 }).addTo(map);
