@@ -313,7 +313,48 @@ L.easyButton({
         icon: 'fas fa-circle-info',
         title: 'Country Information',
         onClick: function() {
-            alert("This button will show information about a country.");
+            const selectedCountry = $('#country').val();
+
+            if (selectedCountry) {
+                $.ajax({
+                    url: "http://localhost/itcareerswitch/project1/libs/php/countryInfo.php",
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        country: selectedCountry
+                    },
+                    success: function(result) {
+                        console.log('Selected country: ', selectedCountry);
+
+                        if (result.status.name === "ok") {
+                            //SweetAlert2 popup
+                            Swal.fire({
+                                title: `Information about ${result.data.countryName}`,
+                                html: `
+                                    <p><strong>Capital of the country:</strong> ${result.data.capital}</p>
+                                    <p><strong>Region:</strong> ${result.data.region}</p>
+                                    <p><strong>Subregion:</strong> ${result.data.subregion}</p>
+                                    <p><strong>Area:</strong> ${result.data.area} km²</p>
+                                    <p><strong>Total population:</strong> ${result.data.population}</p>
+                                    <p><strong>Language spoken:</strong> ${result.data.language}</p>
+                                `,
+                                icon: 'info'
+                            });
+
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: result.status.description,
+                                icon: 'error'
+                            });
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error(textStatus, errorThrown, jqXHR.responseText);
+                            $().html("Error, unable to fetch data.");
+                    } 
+                });
+            }   
         }
     }]
 }).addTo(map);
