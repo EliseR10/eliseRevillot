@@ -75,7 +75,6 @@
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     $exchangeResponse = curl_exec($ch);
     curl_close($ch);
-	//$decode = json_decode($result,true); 
 
     $exchangeData = json_decode($exchangeResponse, true);
     

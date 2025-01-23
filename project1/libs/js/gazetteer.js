@@ -103,8 +103,63 @@ $('#country').change(function () {
                     const borders = L.geoJSON(selectedFeature.geometry).getBounds(); //Get country's bounds
                     map.fitBounds(borders); //Zoom the map to the selected country's bounds
 
-                } else {
-                    alert("Country borders not found!");
+                    /*MAP MARKERS*/
+                    $.ajax({
+                        url: 'http://localhost/itcareerswitch/project1/libs/php/getMarkersData.php',
+                        method: 'GET',
+                        data: { country: selectedCountry },
+                        success: function(result) {
+                            if (result.status.code === '200') {
+                                const markers = result.data.markers;
+                                console.log('Markers:', markers); 
+
+                                // Filter markers based on the selected country code
+                                const filteredMarkers = markers.filter(markerData => markerData.countryCode === selectedCountry);
+
+                                //Create my own customized markers
+                                const airportIcon = L.icon({
+                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+                                    iconSize: [25, 41],
+                                    iconAnchor: [12, 41],
+                                    popupAnchor: [1, -34],
+                                    shadowSize: [41, 41]
+                                });
+
+                                const cityIcon = L.icon({
+                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png',
+                                    iconSize: [25, 41],
+                                    iconAnchor: [12, 41],
+                                    popupAnchor: [1, -34],
+                                    shadowSize: [41, 41]
+                                })
+
+                                // Add each marker to the map
+                                filteredMarkers.forEach(markerData => {
+                                    const lat = markerData.lat;
+                                    const lng = markerData.lng;
+                                    const name = markerData.name;
+                                    const type = markerData.type;
+
+                                    //Create a marker for each location (city or airport)
+                                    let marker;
+                                    if (type === 'Airport') {
+                                        marker = L.marker([lat, lng], { icon: airportIcon }).addTo(map);
+                                    } else if (type === 'City') {
+                                        marker = L.marker([lat, lng], { icon: cityIcon }).addTo(map);
+                                    }
+
+                                    marker.bindPopup(`<b>${name}</b><br>${type}`);
+                                });
+                                
+
+                            } else {
+                                console.error('Error fetching marker data');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('AJAX request failed:', error, status, xhr);
+                        }
+                    })
                 }
             },
             error: function (xhr, status, error) {
