@@ -37,10 +37,10 @@
 
     // Validate API response
     if (!$decode || !isset($decode[0])) {
-        http_response_code(404);
+        http_response_code(400);
         echo json_encode([
             "status" => [
-                "code" => 404,
+                "code" => 400,
                 "name" => "error",
                 "description" => "Country not found or invalid response."
             ]

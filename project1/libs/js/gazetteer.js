@@ -28,6 +28,41 @@ map.on('load', function() {
     hideSpinner();
 });
 
+
+/*USER LOCATION*/
+if (navigator.geolocation) {
+    console.log()
+    navigator.geolocation.getCurrentPosition(success, error, { enableHighAccuracy: true });
+} else {
+    console.error("Geolocation is not supported by this browser.");
+}
+
+function success(position) {
+    const userLat = position.coords.latitude;
+    const userLng = position.coords.longitude;
+
+    //Reverse geocode to get the user's country
+    $.ajax({
+        url: `http://api.geonames.org/countryCodeJSON?lat=${userLat}&lng=${userLng}&username=flightltd`,
+        type: 'GET',
+        dataType: 'json',
+        success: function (result) {
+            const userCountryCode = result.countryCode; // ISO2 country code
+            if (userCountryCode) {
+                // Trigger the dropdown change to zoom to the user's country
+                $('#country').val(userCountryCode).trigger('change');
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error reverse geocoding location:", error);
+        }
+    });
+}
+
+function error(err) {
+    console.warn(`ERROR(${err.code}): ${err.message}`);
+}
+
 /*COUNTRY SELECTION*/
 //Populate the dropdown when the page loads
 $.ajax({
@@ -203,9 +238,9 @@ L.easyButton({
 
                         } else {
                             Swal.fire({
-                                title: 'Error',
-                                text: result.status.description,
-                                icon: 'error'
+                                title: 'Flag',
+                                text: 'No country selected',
+                                icon: 'warning'
                             });
                         }
                     },
@@ -214,7 +249,7 @@ L.easyButton({
                             $().html("Error, unable to fetch data.");
                     } 
                 });
-            }   
+            }  
         }
     }]
 }).addTo(map);
@@ -227,6 +262,16 @@ L.easyButton({
         title: 'News',
         onClick: function() {
             const selectedCountry = $('#country').val();
+
+            if(selectedCountry === "Select a country") {
+                Swal.fire({
+                    title: 'No country selected',
+                    text: 'Please select a country from the dropdown before proceeding.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+                return; // Stop further execution  
+            }
 
             if (selectedCountry) {
                 $.ajax({
@@ -279,6 +324,16 @@ L.easyButton({
         onClick: function() {
             const selectedCountry = $('#country').val();
 
+            if(selectedCountry === "Select a country") {
+                Swal.fire({
+                    title: 'No country selected',
+                    text: 'Please select a country from the dropdown before proceeding.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+                return; // Stop further execution  
+            }
+
             if (selectedCountry) {
                 $.ajax({
                     url: "http://localhost/itcareerswitch/project1/libs/php/currency.php",
@@ -306,17 +361,17 @@ L.easyButton({
                         } else {
                             Swal.fire({
                                 title: 'Error',
-                                text: result.status.description,
-                                icon: 'error'
+                                text: 'No currency are available for the selected country.',
+                                icon: 'warning'
                             });
                         }
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         console.error(textStatus, errorThrown, jqXHR.responseText);
                             $().html("Error, unable to fetch data.");
-                    } 
+                    }
                 });
-            }   
+            }
         }
     }]
 }).addTo(map);
@@ -330,6 +385,16 @@ L.easyButton({
         onClick: function() {
             //Get latitude and longitude from the chosen country
             const selectedCountry = $('#country').val();
+
+            if(selectedCountry === "Select a country") {
+                Swal.fire({
+                    title: 'No country selected',
+                    text: 'Please select a country from the dropdown before proceeding.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+                return; // Stop further execution  
+            }
 
             if (selectedCountry) {
                 $.ajax({
@@ -370,12 +435,11 @@ L.easyButton({
                                         `,
                                         icon: 'info'
                                     });
-
                                 } else {
                                     Swal.fire({
                                         title: 'Error',
                                         text: result.status.description,
-                                        icon: 'error'
+                                        icon: 'warning'
                                     });
                                 }
                             },
@@ -400,6 +464,16 @@ L.easyButton({
         onClick: function() {
             const selectedCountry = $('#country').val();
 
+            if(selectedCountry === "Select a country") {
+                Swal.fire({
+                    title: 'No country selected',
+                    text: 'Please select a country from the dropdown before proceeding.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+                return; // Stop further execution  
+            }
+            
             if (selectedCountry) {
                 $.ajax({
                     url: "http://localhost/itcareerswitch/project1/libs/php/countryInfo.php",
@@ -425,7 +499,6 @@ L.easyButton({
                                 `,
                                 icon: 'info'
                             });
-
                         } else {
                             Swal.fire({
                                 title: 'Error',
