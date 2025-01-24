@@ -381,6 +381,16 @@ L.easyButton({
                                     <p><strong>Currency:</strong> ${result.data.currencyCode}</p>
                                     <p><strong>Currency Symbole:</strong> ${result.data.currencySymbole}</p>
                                     <p><strong>Currency Exchange</strong> £1 = ${result.data.exchangeRate}${result.data.currencySymbole}</p>
+
+                                    <!--Input for amount-->
+                                    <div>
+                                        <label for="amount"></label>
+                                        <input id="amount" type="number" class="swal2-input" placeholder="Amount in GBP" min="1">
+
+                                        <!--Input for result-->
+                                        <label for="conversion"></label>
+                                        <input id="conversion" type="number" class="swal2-input" placeholder="Result conversion" min="1">
+                                    </div>
                                 `,
                                 icon: 'info'
                             });
@@ -450,29 +460,29 @@ L.easyButton({
                             },
                             success: function(result) {
                                 console.log(JSON.stringify(result));
-                
-                                if (result.status.name === "ok") {
-                                    //SweetAlert2 popup
-                                    Swal.fire({
-                                        title: `Weather in ${result.data.location}`,
-                                        html: `
-                                            <p><strong>Morning temperature:</strong> ${result.data.morningTemp} °C</p>
-                                            <p><strong>Afternoon temperature:</strong> ${result.data.afternoonTemp} °C</p>
-                                            <p><strong>Evening temperature:</strong> ${result.data.eveningTemp} °C</p>
-                                            <p><strong>Weather information:</strong> 
-                                                <br>${result.data.weatherDescription}
-                                                <img src="${result.data.weatherIcon}" alt="Weather Icon" width="90" height="90">
-                                            </p>
-                                            `,
-                                        icon: 'info'
-                                    });
-                                } else {
-                                    Swal.fire({
-                                        title: 'Error',
-                                        text: result.status.description,
-                                        icon: 'warning'
-                                    });
-                                }
+                                    if (result.status.name === "ok") {
+                                        let forecastHtml = Object.entries(result.data).map(([date, times]) => `
+                                            <h3>${date}</h3>
+                                            <p><strong>Morning:</strong> ${times.morning ? `${times.morning.temp}°C, ${times.morning.description} <img src="${times.morning.icon}" alt="Morning Icon">` : "No data"}</p>
+                                            <p><strong>Afternoon:</strong> ${times.afternoon ? `${times.afternoon.temp}°C, ${times.afternoon.description} <img src="${times.afternoon.icon}" alt="Afternoon Icon">` : "No data"}</p>
+                                            <p><strong>Evening:</strong> ${times.evening ? `${times.evening.temp}°C, ${times.evening.description} <img src="${times.evening.icon}" alt="Evening Icon">` : "No data"}</p>
+                                            <hr>
+                                        `).join("");
+                                    
+                                        Swal.fire({
+                                            title: "3-Day Weather Forecast",
+                                            html: forecastHtml,
+                                            icon: "info"
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            title: "Error",
+                                            text: result.status.description,
+                                            icon: "warning"
+                                        });
+                                    }
+                                    
+                                
                             },
                             error: function(jqXHR, textStatus, errorThrown) {
                                 console.error(textStatus, errorThrown, jqXHR.responseText);
