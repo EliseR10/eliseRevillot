@@ -30,7 +30,7 @@
     loadEnv(__DIR__ . '/../../.env');
 
     // Access API key
-    $API_KEY = $_SERVER['NewsAPIOrg'];
+    $API_KEY = $_SERVER['NewsDataIo'];
     $country = $_GET['country'] ?? null;
 
     //Check if country is provided
@@ -46,7 +46,7 @@
         exit;
     }
 
-    $url = "https://newsapi.org/v2/top-headlines?country=${country}&apiKey=${API_KEY}";
+    $url = "https://newsdata.io/api/1/latest?apikey=${API_KEY}&country=${country}";
     
     /*cURL request */
 	$ch = curl_init(); 
@@ -69,23 +69,21 @@
 	$output['data'] = [];
 
     //Check if articles are available
-    if (isset($decode['articles']) && count($decode['articles']) > 0) {
-        $article = $decode['articles'][0];
+    if (isset($decode['results']) && count($decode['results']) > 0) {
+        $result = $decode['results'][0];
 
         //Add the first article to the output
         $output['data'] = [
-            'title' => $article['title'] ?? 'No title available',
-            'description' => $article['description'] ?? 'No description available',
-            'url' => $article['url'] ?? 'No link available',
-            'publishedAt' => $article['publishedAt'] ?? 'No published date available'
+            'title' => $result['title'] ?? 'No title available',
+            'description' => $result['description'] ?? 'No description available',
+            'link' => $result['link'] ?? 'No link available',
+            'pubDate' => $result['pubDate'] ?? 'No published date available'
         ];
     } else {
         $output['status']['code'] = 404;
         $output['status']['name'] = "error";
         $output['status']['description'] = "No articles found for the given country.";
         $output['data'] = [];
-        header('Content-Type: application/json; charset=UTF-8'); 
-        echo json_encode($output);
         exit;
     }
 	

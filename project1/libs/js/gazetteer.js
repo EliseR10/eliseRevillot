@@ -315,12 +315,12 @@ L.easyButton({
                             
                             //SweetAlert2 popup
                             Swal.fire({
-                                    title: `Headlines`,
+                                    title: `<i class="fa-regular fa-newspaper"></i> Headlines`,
                                     html: `
                                         <p><strong>Title:</strong> ${result.data.title}</p>
                                         <p><strong>Description:</strong> ${result.data.description}</p>
-                                        <p><strong>Link to full article:</strong> ${result.data.url}</p>
-                                        <p><strong>Published on:</strong> ${result.data.publishedAt}</p>
+                                        <p><strong>Link to full article:</strong> ${result.data.link}</p>
+                                        <p><strong>Published on:</strong> ${result.data.pubDate}</p>
                                     `,
                                     icon: 'info'
                                 });
@@ -456,10 +456,14 @@ L.easyButton({
                                     Swal.fire({
                                         title: `Weather in ${result.data.location}`,
                                         html: `
-                                            <p><strong>Temperature:</strong> ${result.data.temperature} C</p>
-                                            <p><strong>Description:</strong> ${result.data.description}</p>
-                                            <p><strong>Wind Speed:</strong> ${result.data.wind_speed} m/s</p>
-                                        `,
+                                            <p><strong>Morning temperature:</strong> ${result.data.morningTemp} °C</p>
+                                            <p><strong>Afternoon temperature:</strong> ${result.data.afternoonTemp} °C</p>
+                                            <p><strong>Evening temperature:</strong> ${result.data.eveningTemp} °C</p>
+                                            <p><strong>Weather information:</strong> 
+                                                <br>${result.data.weatherDescription}
+                                                <img src="${result.data.weatherIcon}" alt="Weather Icon" width="90" height="90">
+                                            </p>
+                                            `,
                                         icon: 'info'
                                     });
                                 } else {
