@@ -389,10 +389,26 @@ L.easyButton({
 
                                         <!--Input for result-->
                                         <label for="conversion"></label>
-                                        <input id="conversion" type="number" class="swal2-input" placeholder="Result conversion" min="1">
+                                        <input id="conversion" type="number" class="swal2-input" placeholder="Result conversion" readonly min="1">
                                     </div>
                                 `,
-                                icon: 'info'
+                                icon: 'info',
+                                didOpen: () => {
+                                    const amountInput = document.getElementById('amount');
+                                    const conversionInput = document.getElementById('conversion');
+                                    const exchangeRate = result.data.exchangeRate;
+                        
+                                    // Event listener to update the conversion field on input change
+                                    amountInput.addEventListener('input', function() {
+                                        const amount = parseFloat(amountInput.value);
+                                        if (!isNaN(amount)) {
+                                            const convertedAmount = (amount * exchangeRate).toFixed(2);  // Calculate conversion
+                                            conversionInput.value = convertedAmount;  // Update the result
+                                        } else {
+                                            conversionInput.value = '';  // Clear the result if input is invalid
+                                        }
+                                    });
+                                }
                             });
 
                         } else {
