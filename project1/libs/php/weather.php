@@ -70,70 +70,63 @@
 	$output['data'] = [];
 
     if (isset($decode['list']) && !empty($decode['list'])) {
-        // Extract data for the first day
-        $forecastData = $decode['list'];
-
-        $morningTemp = 'N/A';
-        $afternoonTemp = 'N/A';
-        $eveningTemp = 'N/A';
-        $weatherDescription = 'N/A';
-        $weatherIcon = 'N/A';
-        $location = 'N/A';
-
-        //Iterate through hourly forcast data to find temperatures for morning, afternoon, evening
+        $forecastData = $decode['list']; // The forecast data
+        $dailyForecasts = []; // To store the forecasts for 3 days
+    
+        // Loop through forecast data and group by date and time
         foreach ($forecastData as $forecast) {
-            $dt_txt = $forecast['dt_txt'];
+            $date = date("Y-m-d", strtotime($forecast['dt_txt'])); // Extract the date
+            $hour = date("H", strtotime($forecast['dt_txt'])); // Extract the hour
             $temp = $forecast['main']['temp'];
             $description = $forecast['weather'][0]['description'];
             $iconCode = $forecast['weather'][0]['icon'];
-            $city = $decode['city']['name'];
-
-            //Extract the hour from the datetime string
-            $hour = date("H", strtotime($dt_txt)); //Get the hour in 24h format
-
-            // Assign the icon URL to the output (based on OpenWeather's icon URLs)
-            $iconUrl = "https://openweathermap.org/img/wn/{$iconCode}@2x.png";
-
-            // Assign temperatures for morning, afternoon, and evening based on the hour
+    
+            // Initialize the daily forecast if not already set
+            if (!isset($dailyForecasts[$date])) {
+                $dailyForecasts[$date] = [
+                    'morning' => null,
+                    'afternoon' => null,
+                    'evening' => null
+                ];
+            }
+    
+            // Assign data based on time of day
             if ($hour == '06') {
-                $morningTemp = $temp;
-                $weatherDescription = $description;
-                $weatherIcon = $iconCode;
-                $location = $city;
+                $dailyForecasts[$date]['morning'] = [
+                    'temp' => $temp,
+                    'description' => $description,
+                    'icon' => "https://openweathermap.org/img/wn/{$iconCode}@2x.png"
+                ];
             } elseif ($hour == '12') {
-                $afternoonTemp = $temp;
-                $weatherDescription = $description;
-                $weatherIcon = $iconCode;
-                $location = $city;
+                $dailyForecasts[$date]['afternoon'] = [
+                    'temp' => $temp,
+                    'description' => $description,
+                    'icon' => "https://openweathermap.org/img/wn/{$iconCode}@2x.png"
+                ];
             } elseif ($hour == '18') {
-                $eveningTemp = $temp;
-                $weatherDescription = $description;
-                $weatherIcon = $iconCode;
-                $location = $city;
+                $dailyForecasts[$date]['evening'] = [
+                    'temp' => $temp,
+                    'description' => $description,
+                    'icon' => "https://openweathermap.org/img/wn/{$iconCode}@2x.png"
+                ];
             }
         }
-               
-        //Add the first article to the output
-        $output['status']['code'] = "200"; 
-	    $output['status']['name'] = "ok"; 
-	    $output['status']['description'] = "success";
-	    $output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
-        $output['data'] = [
-            'morningTemp' => $morningTemp,
-            'afternoonTemp' => $afternoonTemp,
-            'eveningTemp' => $eveningTemp,
-            'weatherDescription' => $weatherDescription,
-            'weatherIcon' => "https://openweathermap.org/img/wn/{$weatherIcon}@2x.png",
-            'location' => $location,
-        ];
+    
+        // Limit to the next 3 days
+        $limitedForecasts = array_slice($dailyForecasts, 0, 3);
+    
+        $output['status']['code'] = "200";
+        $output['status']['name'] = "ok";
+        $output['status']['description'] = "success";
+        $output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
+        $output['data'] = $limitedForecasts;
     } else {
         $output['status']['code'] = 404;
         $output['status']['name'] = "error";
-        $output['status']['description'] = "No weather information found for the given country.";
+        $output['status']['description'] = "No weather information found.";
         $output['data'] = [];
     }
 
-	
 	header('Content-Type: application/json; charset=UTF-8'); 
 	echo json_encode($output);
 ?>
