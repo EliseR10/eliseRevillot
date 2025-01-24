@@ -4,12 +4,23 @@ $(document).ready(function () {
 //Initialize the map and set its view to show the entire world
 const map = L.map('map').setView([0, 0], 2);
 
-//Add tiles layer (shows the map in itself)
+//Add tiles layer (shows the map in itself) + satellite view
 const tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
+var satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+    attribution: "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+  }
+);
+
+var basemaps = {
+  "Streets": tileLayer,
+  "Satellite": satellite
+};
+
+layerControl = L.control.layers(basemaps).addTo(map);
 
 /*LOADING SPINNER*/
 function showSpinner() {
@@ -389,7 +400,7 @@ L.easyButton({
 
                                         <!--Input for result-->
                                         <label for="conversion"></label>
-                                        <input id="conversion" type="number" class="swal2-input" placeholder="Result conversion" readonly min="1">
+                                        <input id="conversion" type="number" class="swal2-input" placeholder="Amount in ${result.data.currencyCode}" readonly min="1">
                                     </div>
                                 `,
                                 icon: 'info',
