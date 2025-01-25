@@ -46,9 +46,29 @@
               <span class="visually-hidden">Loading...</span>
             </div>
           </div>
-        
+
+          <div class="btn-group">
+            <button type="button" class="btn btn-outline-dark btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                Markers
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <div class="form-check dropdown-item">
+                        <input class="form-check-input" type="checkbox" id="toggleCities" checked>
+                        <label class="form-check-label" for="toggleCities">Show Cities</label>
+                    </div>
+                </li>
+                <li>
+                    <div class="form-check dropdown-item">
+                        <input class="form-check-input" type="checkbox" id="toggleAirports" checked>
+                        <label class="form-check-label" for="toggleAirports">Show Airports</label>
+                    </div>
+                </li>
+            </ul>
+          </div>
+
           <div id="map">
-            <div class="countryWeatherResult"></div>
+            <!--<div class="countryWeatherResult"></div>-->
           </div>
         
         <!--Scripts-->
