@@ -191,7 +191,7 @@ $('#country').change(function () {
 
                                 //Create my own customized markers
                                 const airportIcon = L.icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+                                    iconUrl: './libs/plane-departure-solid.svg',
                                     iconSize: [25, 41],
                                     iconAnchor: [12, 41],
                                     popupAnchor: [1, -34],
@@ -199,8 +199,8 @@ $('#country').change(function () {
                                 });
 
                                 const cityIcon = L.icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png',
-                                    iconSize: [25, 41],
+                                    iconUrl: './libs/tree-city-solid.svg',
+                                    iconSize: [40, 40],
                                     iconAnchor: [12, 41],
                                     popupAnchor: [1, -34],
                                     shadowSize: [41, 41]
@@ -216,12 +216,12 @@ $('#country').change(function () {
                                     //Create a marker for each location (city or airport)
                                     let marker;
                                     if (type === 'Airport') {
-                                        marker = L.marker([lat, lng], { icon: airportIcon }).addTo(map);
+                                        marker = L.marker([lat, lng], { icon: airportIcon }).addTo(map).bindPopup({name});
                                     } else if (type === 'City') {
-                                        marker = L.marker([lat, lng], { icon: cityIcon }).addTo(map);
+                                        marker = L.marker([lat, lng], { icon: cityIcon }).addTo(map).bindPopup({name});
                                     }
 
-                                    marker.bindPopup(`<b>${name}</b><br>${type}`);
+                                    //marker.bindPopup(`<b>${name}</b><br>${type}`);
                                 });
                                 
 
@@ -386,7 +386,7 @@ L.easyButton({
                         if (result.status.name === "ok") {
                             //SweetAlert2 popup
                             Swal.fire({
-                                title: `${result.data.currencyName}`,
+                                title: `<i class="fa-solid fa-coins"></i> ${result.data.currencyName}`,
                                 
                                 html: `
                                     <p><strong>Currency:</strong> ${result.data.currencyCode}</p>
