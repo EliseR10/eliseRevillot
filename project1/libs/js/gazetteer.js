@@ -17,7 +17,7 @@ var satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/service
 
 var basemaps = {
   "Streets": tileLayer,
-  "Satellite": satellite
+  "Satellite": satellite,
 };
 
 layerControl = L.control.layers(basemaps).addTo(map);
@@ -176,6 +176,41 @@ $('#country').change(function () {
                     const borders = L.geoJSON(selectedFeature.geometry).getBounds(); //Get country's bounds
                     map.fitBounds(borders); //Zoom the map to the selected country's bounds
 
+                    /*CHOOSE MARKERS*/
+                    var toggleControl = L.Control.extend({
+                        options: {
+                            position: 'topright'
+                        },
+
+                        onAdd: function (map) {
+                            // Create a container div with Bootstrap styling
+                            var container = L.DomUtil.create('div', 'leaflet-control-custom');
+                            container.innerHTML = `
+                                <div class="toggle-button">
+                                    <button class="btn btn-light btn-sm">Markers</button>
+                                    <div class="toggle-options">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="toggleCities" checked>
+                                            <label class="form-check-label" for="toggleCities">Show Cities</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="toggleAirports" checked>
+                                            <label class="form-check-label" for="toggleAirports">Show Airports</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+
+                            // Prevent map interactions when interacting with the control
+                            L.DomEvent.disableClickPropagation(container);
+
+                            return container;
+                        }
+                    });
+
+                    // Add the custom control to the map
+                    map.addControl(new toggleControl());
+
                     /*MAP MARKERS*/
                     $.ajax({
                         url: 'http://localhost/itcareerswitch/project1/libs/php/getMarkersData.php',
@@ -209,7 +244,11 @@ $('#country').change(function () {
                                     iconAnchor: [12, 41],
                                     popupAnchor: [1, -34],
                                     shadowSize: [41, 41]
-                                })
+                                });
+
+                                // Create arrays to store the markers for cities and airports
+                                const cityMarkers = [];
+                                const airportMarkers = [];
 
                                 // Add markers for Cities
                                 filteredCities.forEach(city => {
@@ -224,6 +263,8 @@ $('#country').change(function () {
                                     //Bind a popup to the marker
                                     cityMarker.bindPopup(`<b>Name:</b> ${name}<br><b>Type:</b> ${type}`);
 
+                                    // Add the marker to the cityMarkers array
+                                    cityMarkers.push(cityMarker);
                                     //Add the marker to the cluster group
                                     markersCluster.addLayer(cityMarker);
                                 });
@@ -241,12 +282,31 @@ $('#country').change(function () {
                                     //Bindpop up
                                     airportMarker.bindPopup(`<b>Name:</b> ${name}<br><b>Type:</b> ${type}`);
 
+                                    // Add the marker to the airportMarkers array
+                                    airportMarkers.push(airportMarker);
                                     //Add the marker to the cluster group
                                     markersCluster.addLayer(airportMarker);
                                 });
 
                                 // Add the cluster group to the map
                                 map.addLayer(markersCluster);
+
+                                // Toggle markers on checkbox change
+                                $('#toggleCities').on('change', function () {
+                                    if (this.checked) {
+                                        cityMarkers.forEach(marker => markersCluster.addLayer(marker)); // Show city markers
+                                    } else {
+                                        cityMarkers.forEach(marker => markersCluster.removeLayer(marker)); // Hide city markers
+                                    }
+                                });
+
+                                $('#toggleAirports').on('change', function () {
+                                    if (this.checked) {
+                                        airportMarkers.forEach(marker => markersCluster.addLayer(marker)); // Show airport markers
+                                    } else {
+                                        airportMarkers.forEach(marker => markersCluster.removeLayer(marker)); // Hide airport markers
+                                    }
+                                });
                             } else {
                                 console.error('Error fetching marker data');
                             }
