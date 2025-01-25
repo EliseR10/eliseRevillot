@@ -182,12 +182,17 @@ $('#country').change(function () {
                         method: 'GET',
                         data: { country: selectedCountry },
                         success: function(result) {
+                            console.log(result);
                             if (result.status.code === '200') {
-                                const markers = result.data.markers;
-                                console.log('Markers:', markers); 
+                                const cities = result.data.cities;
+                                const airport = result.data.airport;
+                                
+                                //Filter markers based on the selected country code
+                                const filteredCities = cities.filter(city => city.countryCode === selectedCountry);
+                                const filteredAirport = airport.filter(airport => airport.countryCode === selectedCountry);
 
-                                // Filter markers based on the selected country code
-                                const filteredMarkers = markers.filter(markerData => markerData.countryCode === selectedCountry);
+                                //Create a MarkerClusterGroup to hold the markers
+                                const markersCluster = L.markerClusterGroup();
 
                                 //Create my own customized markers
                                 const airportIcon = L.icon({
@@ -206,25 +211,42 @@ $('#country').change(function () {
                                     shadowSize: [41, 41]
                                 })
 
-                                // Add each marker to the map
-                                filteredMarkers.forEach(markerData => {
-                                    const lat = markerData.lat;
-                                    const lng = markerData.lng;
-                                    const name = markerData.name;
-                                    const type = markerData.type;
+                                // Add markers for Cities
+                                filteredCities.forEach(city => {
+                                    const lat = city.lat;
+                                    const lng = city.lng;
+                                    const name = city.name;
+                                    const type = city.type;
 
-                                    //Create a marker for each location (city or airport)
-                                    let marker;
-                                    if (type === 'Airport') {
-                                        marker = L.marker([lat, lng], { icon: airportIcon }).addTo(map).bindPopup({name});
-                                    } else if (type === 'City') {
-                                        marker = L.marker([lat, lng], { icon: cityIcon }).addTo(map).bindPopup({name});
-                                    }
+                                    //Create a marker for city
+                                    const cityMarker = L.marker([lat, lng], {icon: cityIcon});
+                                    
+                                    //Bind a popup to the marker
+                                    cityMarker.bindPopup(`<b>Name:</b> ${name}<br><b>Type:</b> ${type}`);
 
-                                    //marker.bindPopup(`<b>${name}</b><br>${type}`);
+                                    //Add the marker to the cluster group
+                                    markersCluster.addLayer(cityMarker);
                                 });
-                                
 
+                                //Add markers for Airports
+                                filteredAirport.forEach(airport => {
+                                    const lat = airport.lat;
+                                    const lng = airport.lng;
+                                    const name = airport.name;
+                                    const type = airport.type;
+
+                                    //Create a marker for airport + binPopup
+                                    const airportMarker = L.marker([lat, lng], {icon: airportIcon});
+                                    
+                                    //Bindpop up
+                                    airportMarker.bindPopup(`<b>Name:</b> ${name}<br><b>Type:</b> ${type}`);
+
+                                    //Add the marker to the cluster group
+                                    markersCluster.addLayer(airportMarker);
+                                });
+
+                                // Add the cluster group to the map
+                                map.addLayer(markersCluster);
                             } else {
                                 console.error('Error fetching marker data');
                             }

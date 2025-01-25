@@ -30,26 +30,17 @@
 	$output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
 	$output['data'] = [];
 
-    // Limit of markers
-    $maxMarkers = 50;
     $cityMarkers = [];
     $airportMarkers = [];
 
     /*GET CITIES*/
-    $citiesUrl = "http://api.geonames.org/searchJSON?formatted=true&q=${country}&maxRows=10&lang=en&username=flightltd&style=full";
-    
-    /*cURL request*/
-    $ch = curl_init($citiesUrl);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    $citiesResponse = curl_exec($ch);
-    curl_close($ch);
-
+    $citiesUrl = "http://api.geonames.org/searchJSON?formatted=true&q=city&maxRows=195&lang=en&username=flightltd&style=full&country=";
+    $citiesResponse = file_get_contents($citiesUrl); // Get city data
     $citiesData = json_decode($citiesResponse, true);
     
     if (isset($citiesData['geonames']) && count($citiesData['geonames']) > 0) {
-        //Collect cities data, but limit to $maxMarkers - 25
-        foreach(array_slice($citiesData['geonames'], 0, 25) as $city) {
+        //Collect cities data
+        foreach(array_slice($citiesData['geonames'], 0, 195) as $city) {
             $city['type'] = 'City';
             $city['countryCode'] = $city['countryCode'] ?? 'unknown'; 
             $cityMarkers[] = $city;
@@ -57,38 +48,38 @@
     }
 
     /*GET AIRPORTS*/
-    $airportUrl = "http://api.geonames.org/searchJSON?formatted=true&q=${country}&maxRows=10&type=airport&lang=en&username=flightltd&style=full";
-    
-    /*cURL request*/
-    $ch = curl_init($airportUrl);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    $airportResponse = curl_exec($ch);
-    curl_close($ch);
-
+    $airportUrl = "http://api.geonames.org/searchJSON?formatted=true&q=airport&maxRows=195&type=airport&lang=en&username=flightltd&style=full&country=";
+    $airportResponse = file_get_contents($airportUrl); // Get airport data
     $airportData = json_decode($airportResponse, true);
     
     if (isset($airportData['geonames']) && count($airportData['geonames']) > 0) {
-        // Collect airport data, but limit to $maxMarkers - 25
-        foreach(array_slice($airportData['geonames'], 0, 25) as $airport) {
+        // Collect airport data
+        foreach(array_slice($airportData['geonames'], 0, 195) as $airport) {
             $airport['type'] = 'Airport';
             $airport['countryCode'] = $airport['countryCode'] ?? 'unknown'; 
             $airportMarkers[] = $airport;
         }
     }
 
-    //Combine cities and airport
-    $combinedMarkers = array_merge($cityMarkers, $airportMarkers);
+    // Return filtered data for the selected countries
+    if ($country) {
+        $filteredCities = array_filter($cityMarkers, function($city) use ($country) {
+            return $city['countryCode'] == $country;
+        });
 
-    //Shuffle the combined markers to spread them
-    shuffle($combinedMarkers);
+        $filteredAirports = array_filter($airportMarkers, function($airport) use ($country) {
+            return $airport['countryCode'] == $country;
+        });
+    } else {
+        // Return all cities and airports if no country is selected
+        $filteredCities = $cityMarkers;
+        $filteredAirports = $airportMarkers;
+    }
 
-    //Limit the number of markers to 50
-    $combinedMarkers = array_slice($combinedMarkers, 0, $maxMarkers);
-
-    //Response
-	$output['data'] = [
-        "markers" => $combinedMarkers
+    // Response
+    $output['data'] = [
+        "cities" => array_values($filteredCities),
+        "airport" => array_values($filteredAirports)
     ];
 	
 	header('Content-Type: application/json; charset=UTF-8'); 
