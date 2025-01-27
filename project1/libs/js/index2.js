@@ -46,7 +46,6 @@ $(document).ready(function () {
 
   //infoBtn.addTo(map);
 
-
 /*USER LOCATION*/
 if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(success, error, { enableHighAccuracy: true });
@@ -145,6 +144,10 @@ $.ajax({
     }
 });
 
+// Define marker LayerGroups
+let citiesLayer = L.markerClusterGroup();
+let airportsLayer = L.markerClusterGroup();
+
 //Handle dropdown change
 $('#countrySelect').change(function () {
     const selectedCountry = $(this).val(); //Get selected ISO2 code
@@ -162,13 +165,6 @@ $('#countrySelect').change(function () {
                 );
 
                 if (selectedFeature) {
-                    //Clear existing layers from the map
-                    map.eachLayer(function (layer) {
-                        if (layer instanceof L.GeoJSON) {
-                            map.removeLayer(layer);
-                        }
-                    });
-
                     // Add the selected country's borders to the map
                     L.geoJSON(selectedFeature.geometry, {
                         style: {
@@ -182,10 +178,96 @@ $('#countrySelect').change(function () {
                     /*ZOOM MAP*/
                     const borders = L.geoJSON(selectedFeature.geometry).getBounds(); //Get country's bounds
                     map.fitBounds(borders); //Zoom the map to the selected country's bounds
-                
+
+                    /* REMOVE EXISTING MARKERS */
+                    citiesLayer.clearLayers(); // Clear previous city markers
+                    airportsLayer.clearLayers(); // Clear previous airport markers
+
                     /*MARKERS*/
+                    // Define custom icons for airports and cities
+                    const airportIcon = L.icon({
+                        iconUrl: './libs/plane-departure-solid.svg',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        shadowSize: [41, 41]
+                    });
+
+                    const cityIcon = L.icon({
+                        iconUrl: './libs/tree-city-solid.svg',
+                        iconSize: [40, 40],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        shadowSize: [41, 41]
+                    });
+
+                    // Define custom cluster icons
+                    const clusterIcon = L.divIcon({
+                        className: 'custom-cluster',
+                        html: '<div class="cluster-number"></div>',
+                        iconSize: [40, 40],
+                        iconAnchor: [20, 20],
+                        popupAnchor: [0, -20]
+                    });
+
+                    // Customize the cluster appearance
+                    citiesLayer.options.iconCreateFunction = function(cluster) {
+                        return L.divIcon({
+                            className: 'leaflet-cluster',
+                            html: `<div style="background-color: purple; border-radius: 50%; color: white; font-size: 14px; text-align: center; line-height: 40px; width: 40px; height: 40px;">${cluster.getChildCount()}</div>`,
+                            iconSize: [40, 40]
+                        });
+                    };
+
+                    airportsLayer.options.iconCreateFunction = function(cluster) {
+                        return L.divIcon({
+                            className: 'leaflet-cluster',
+                            html: `<div style="background-color: red; border-radius: 50%; color: white; font-size: 14px; text-align: center; line-height: 40px; width: 40px; height: 40px;">${cluster.getChildCount()}</div>`,
+                            iconSize: [40, 40]
+                        });
+                    };
+
+                    //Fetch marker data and populate layers
+                    function fetchMarkers(countryCode) {
+                        $.ajax({
+                            url: 'http://localhost/itcareerswitch/project1/libs/php/getMarkersData.php',
+                            method: 'GET',
+                            data: { country: countryCode },
+                            success: function (result) {
+                                if (result.status.code === '200') {
+                                    const cities = result.data.cities;
+                                    const airports = result.data.airports;
+                                    console.log(result); 
+
+                                    // Create city markers
+                                    cities.forEach(city => {
+                                        const cityMarker = L.marker([city.lat, city.lng], {icon: cityIcon})
+                                            .bindPopup(`<b>City:</b> ${city.name}`);
+                                        citiesLayer.addLayer(cityMarker);
+                                    });
                     
-                
+                                    // Create airport markers
+                                    airports.forEach(airport => {
+                                        const airportMarker = L.marker([airport.lat, airport.lng], {icon: airportIcon})
+                                            .bindPopup(`<b>Airport:</b> ${airport.name}`);
+                                        airportsLayer.addLayer(airportMarker);
+                                    });
+                    
+                                    // Only add layers (markers) to the map once
+                                    if (!map.hasLayer(citiesLayer)) {
+                                        citiesLayer.addTo(map);
+                                    }
+                                    if (!map.hasLayer(airportsLayer)) {
+                                        airportsLayer.addTo(map);
+                                    }   
+
+                                } else {
+                                    console.error('Failed to fetch marker data');
+                                }
+                            }
+                        })
+                    }
+                    fetchMarkers(selectedCountry);
                 };
             },
             error: function (xhr, status, error) {
