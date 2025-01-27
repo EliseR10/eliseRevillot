@@ -147,6 +147,7 @@ $.ajax({
 // Define marker LayerGroups
 let citiesLayer = L.markerClusterGroup();
 let airportsLayer = L.markerClusterGroup();
+let countryBorderLayer = null;
 
 //Handle dropdown change
 $('#countrySelect').change(function () {
@@ -165,8 +166,12 @@ $('#countrySelect').change(function () {
                 );
 
                 if (selectedFeature) {
+                    if (countryBorderLayer) {
+                        map.removeLayer(countryBorderLayer); // Remove previous border layer
+                    }
+
                     // Add the selected country's borders to the map
-                    L.geoJSON(selectedFeature.geometry, {
+                    countryBorderLayer = L.geoJSON(selectedFeature.geometry, {
                         style: {
                             color: "blue",    // Border color
                             weight: 2,       // Border thickness
