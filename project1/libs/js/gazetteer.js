@@ -1,14 +1,15 @@
-$(document).ready(function () {
+// ---------------------------------------------------------
+// GLOBAL DECLARATIONS
+// ---------------------------------------------------------
 
-/*MAP*/
-//Initialize the map and set its view to show the entire world
-const map = L.map('map').setView([0, 0], 2);
+var map;
 
-//Add tiles layer (shows the map in itself) + satellite view
-const tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-}).addTo(map);
+// tile layers
+
+var streets = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
+    attribution: "Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012"
+  }
+);
 
 var satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
     attribution: "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
@@ -16,29 +17,34 @@ var satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/service
 );
 
 var basemaps = {
-  "Streets": tileLayer,
-  "Satellite": satellite,
+  "Streets": streets,
+  "Satellite": satellite
 };
 
-layerControl = L.control.layers(basemaps).addTo(map);
+// buttons
 
-/*LOADING SPINNER*/
-function showSpinner() {
-    document.getElementById('spinner-border').style.display = 'flex';
-}
-
-function hideSpinner() {
-    document.getElementById('spinner-border').style.display = 'none';
-}
-
-map.on('loading', function() {
-    showSpinner();
+var infoBtn = L.easyButton("fa-info fa-xl", function (btn, map) {
+  $("#exampleModal").modal("show");
 });
 
-map.on('load', function() {
-    hideSpinner();
-});
+// ---------------------------------------------------------
+// EVENT HANDLERS
+// ---------------------------------------------------------
 
+// initialise and add controls once DOM is ready
+
+$(document).ready(function () {
+  
+  map = L.map("map", {
+    layers: [streets]
+  }).setView([54.5, -4], 6);
+  
+  // setView is not required in your application as you will be
+  // deploying map.fitBounds() on the country border polygon
+
+  layerControl = L.control.layers(basemaps).addTo(map);
+
+  //infoBtn.addTo(map);
 
 /*USER LOCATION*/
 if (navigator.geolocation) {
@@ -66,7 +72,7 @@ function success(position) {
                 console.log('User Country Code:', userCountryCode);
 
                 // Trigger the dropdown change to zoom to the user's country
-                $('#country').val(userCountryCode).trigger('change');
+                $('#countrySelect').val(userCountryCode).trigger('change');
             }
         },
         error: function (xhr, status, error) {
@@ -108,7 +114,7 @@ $.ajax({
     type: 'GET',
     dataType: 'json',
     success: function (result) {
-        const countryDropdown = $('#country'); //Dropdown element
+        const countryDropdown = $('#countrySelect'); //Dropdown element
         const countryOptions = [];
 
         //Get country names and ISO2 codes
@@ -138,8 +144,13 @@ $.ajax({
     }
 });
 
+// Define marker LayerGroups
+let citiesLayer = L.markerClusterGroup();
+let airportsLayer = L.markerClusterGroup();
+let countryBorderLayer = null;
+
 //Handle dropdown change
-$('#country').change(function () {
+$('#countrySelect').change(function () {
     const selectedCountry = $(this).val(); //Get selected ISO2 code
 
     if (selectedCountry) {
@@ -155,15 +166,12 @@ $('#country').change(function () {
                 );
 
                 if (selectedFeature) {
-                    //Clear existing layers from the map
-                    map.eachLayer(function (layer) {
-                        if (layer instanceof L.GeoJSON) {
-                            map.removeLayer(layer);
-                        }
-                    });
+                    if (countryBorderLayer) {
+                        map.removeLayer(countryBorderLayer); // Remove previous border layer
+                    }
 
                     // Add the selected country's borders to the map
-                    L.geoJSON(selectedFeature.geometry, {
+                    countryBorderLayer = L.geoJSON(selectedFeature.geometry, {
                         style: {
                             color: "blue",    // Border color
                             weight: 2,       // Border thickness
@@ -176,122 +184,109 @@ $('#country').change(function () {
                     const borders = L.geoJSON(selectedFeature.geometry).getBounds(); //Get country's bounds
                     map.fitBounds(borders); //Zoom the map to the selected country's bounds
 
-                    /*MAP MARKERS*/
-                    $.ajax({
-                        url: 'http://localhost/itcareerswitch/project1/libs/php/getMarkersData.php',
-                        method: 'GET',
-                        data: { country: selectedCountry },
-                        success: function(result) {
-                            console.log(result);
-                            if (result.status.code === '200') {
-                                const cities = result.data.cities;
-                                const airport = result.data.airport;
-                                
-                                //Filter markers based on the selected country code
-                                const filteredCities = cities.filter(city => city.countryCode === selectedCountry);
-                                const filteredAirport = airport.filter(airport => airport.countryCode === selectedCountry);
+                    /* REMOVE EXISTING MARKERS */
+                    citiesLayer.clearLayers(); // Clear previous city markers
+                    airportsLayer.clearLayers(); // Clear previous airport markers
 
-                                //Create a MarkerClusterGroup to hold the markers
-                                const markersCluster = L.markerClusterGroup();
+                    /*MARKERS*/
+                    // Define custom icons for airports and cities
+                    const airportIcon = L.icon({
+                        iconUrl: './libs/plane-departure-solid.svg',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        shadowSize: [41, 41]
+                    });
 
-                                //Create my own customized markers
-                                const airportIcon = L.icon({
-                                    iconUrl: './libs/plane-departure-solid.svg',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
+                    const cityIcon = L.icon({
+                        iconUrl: './libs/tree-city-solid.svg',
+                        iconSize: [40, 40],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        shadowSize: [41, 41]
+                    });
 
-                                const cityIcon = L.icon({
-                                    iconUrl: './libs/tree-city-solid.svg',
-                                    iconSize: [40, 40],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
+                    // Define custom cluster icons
+                    const clusterIcon = L.divIcon({
+                        className: 'custom-cluster',
+                        html: '<div class="cluster-number"></div>',
+                        iconSize: [40, 40],
+                        iconAnchor: [20, 20],
+                        popupAnchor: [0, -20]
+                    });
 
-                                //Create arrays to store the markers for cities and airports
-                                const cityMarkers = [];
-                                const airportMarkers = [];
+                    // Customize the cluster appearance
+                    citiesLayer.options.iconCreateFunction = function(cluster) {
+                        return L.divIcon({
+                            className: 'leaflet-cluster',
+                            html: `<div style="background-color: purple; border-radius: 50%; color: white; font-size: 14px; text-align: center; line-height: 40px; width: 40px; height: 40px;">${cluster.getChildCount()}</div>`,
+                            iconSize: [40, 40]
+                        });
+                    };
 
-                                // Add markers for Cities
-                                filteredCities.forEach(city => {
-                                    const lat = city.lat;
-                                    const lng = city.lng;
-                                    const name = city.name;
-                                    const type = city.type;
+                    airportsLayer.options.iconCreateFunction = function(cluster) {
+                        return L.divIcon({
+                            className: 'leaflet-cluster',
+                            html: `<div style="background-color: red; border-radius: 50%; color: white; font-size: 14px; text-align: center; line-height: 40px; width: 40px; height: 40px;">${cluster.getChildCount()}</div>`,
+                            iconSize: [40, 40]
+                        });
+                    };
 
-                                    //Create a marker for city
-                                    const cityMarker = L.marker([lat, lng], {icon: cityIcon});
-                                    
-                                    //Bind a popup to the marker
-                                    cityMarker.bindPopup(`<b>Name:</b> ${name}<br><b>Type:</b> ${type}`);
+                    //Fetch marker data and populate layers
+                    function fetchMarkers(countryCode) {
+                        $.ajax({
+                            url: 'http://localhost/itcareerswitch/project1/libs/php/getMarkersData.php',
+                            method: 'GET',
+                            data: { country: countryCode },
+                            success: function (result) {
+                                if (result.status.code === '200') {
+                                    const cities = result.data.cities;
+                                    const airports = result.data.airports;
 
-                                    // Add the marker to the cityMarkers array
-                                    cityMarkers.push(cityMarker);
+                                    // Create city markers
+                                    cities.forEach(city => {
+                                        const cityMarker = L.marker([city.lat, city.lng], {icon: cityIcon})
+                                            .bindPopup(`<b>City:</b> ${city.name}`);
+                                        citiesLayer.addLayer(cityMarker);
+                                    });
+                    
+                                    // Create airport markers
+                                    airports.forEach(airport => {
+                                        const airportMarker = L.marker([airport.lat, airport.lng], {icon: airportIcon})
+                                            .bindPopup(`<b>Airport:</b> ${airport.name}`);
+                                        airportsLayer.addLayer(airportMarker);
+                                    });
 
-                                    //Add the marker to the cluster group
-                                    markersCluster.addLayer(cityMarker);
-                                });
-
-                                //Add markers for Airports
-                                filteredAirport.forEach(airport => {
-                                    const lat = airport.lat;
-                                    const lng = airport.lng;
-                                    const name = airport.name;
-                                    const type = airport.type;
-
-                                    //Create a marker for airport
-                                    const airportMarker = L.marker([lat, lng], {icon: airportIcon});
-                                    
-                                    //Bindpop up
-                                    airportMarker.bindPopup(`<b>Name:</b> ${name}<br><b>Type:</b> ${type}`);
-
-                                    //Add the marker to the airportMarkers array
-                                    airportMarkers.push(airportMarker);
-
-                                    //Add the marker to the cluster group
-                                    markersCluster.addLayer(airportMarker);
-                                });
-
-                                // Add the cluster group to the map
-                                map.addLayer(markersCluster);
-
-                                // Handle the marker toggling based on checkbox state
-                                $('#toggleCities').on('change', function() {
-                                    if (this.checked) {
-                                        cityMarkers.forEach(marker => markersCluster.addLayer(marker)); // Show city markers
-                                    } else {
-                                        cityMarkers.forEach(marker => markersCluster.removeLayer(marker)); // Hide city markers
+                                                        
+                                    // Add layers to map through Layer Control
+                                    if (!map.hasLayer(citiesLayer) && !map.hasLayer(airportsLayer)) {
+                                        citiesLayer.addTo(map);
+                                        airportsLayer.addTo(map);
                                     }
-                                });
 
-                                $('#toggleAirports').on('change', function() {
-                                    if (this.checked) {
-                                        airportMarkers.forEach(marker => markersCluster.addLayer(marker)); // Show airport markers
-                                    } else {
-                                        airportMarkers.forEach(marker => markersCluster.removeLayer(marker)); // Hide airport markers
-                                    }
-                                });
-                                
-                            } else {
-                                console.error('Error fetching marker data');
+                                } else {
+                                    console.error('Failed to fetch marker data');
+                                }
                             }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('AJAX request failed:', error, status, xhr);
-                        }
-                    })
-                }
+                        })
+                    }
+                    fetchMarkers(selectedCountry);
+                };
             },
             error: function (xhr, status, error) {
                 console.error("Error loading country data:", error);
                 alert("Error loading country data.");
             }
-        });
+        })
     }
 });
+
+const overlayMaps = {
+    "Cities": citiesLayer,
+    "Airports": airportsLayer
+};
+
+L.control.layers(null, overlayMaps, {collapsed: false}).addTo(map);
 
 /*EASY BUTTON MAP*/
 L.easyButton({
@@ -301,7 +296,7 @@ L.easyButton({
         icon: 'fas fa-flag',
         title: 'Flag',
         onClick: function() {
-            const selectedCountry = $('#country').val();
+            const selectedCountry = $('#countrySelect').val();
 
             if (selectedCountry) {
                 $.ajax({
@@ -349,7 +344,7 @@ L.easyButton({
         icon: 'fas fa-link',
         title: 'News',
         onClick: function() {
-            const selectedCountry = $('#country').val();
+            const selectedCountry = $('#countrySelect').val();
 
             if(selectedCountry === "Select a country") {
                 Swal.fire({
@@ -410,7 +405,7 @@ L.easyButton({
         icon: 'fas fa-money-bill-1',
         title: 'Currency',
         onClick: function() {
-            const selectedCountry = $('#country').val();
+            const selectedCountry = $('#countrySelect').val();
 
             if(selectedCountry === "Select a country") {
                 Swal.fire({
@@ -498,7 +493,7 @@ L.easyButton({
         title: 'Weather Information',
         onClick: function() {
             //Get latitude and longitude from the chosen country
-            const selectedCountry = $('#country').val();
+            const selectedCountry = $('#countrySelect').val();
 
             if(selectedCountry === "Select a country") {
                 Swal.fire({
@@ -580,7 +575,7 @@ L.easyButton({
         icon: 'fas fa-circle-info',
         title: 'Country Information',
         onClick: function() {
-            const selectedCountry = $('#country').val();
+            const selectedCountry = $('#countrySelect').val();
 
             if(selectedCountry === "Select a country") {
                 Swal.fire({
@@ -634,5 +629,4 @@ L.easyButton({
         }
     }]
 }).addTo(map);
-
 })
