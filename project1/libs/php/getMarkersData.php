@@ -24,28 +24,16 @@
         exit;
     }
 
-    /*Response
-	$output['status']['code'] = "200"; 
-	$output['status']['name'] = "ok"; 
-	$output['status']['description'] = "success";
-	$output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
-	$output['data'] = [];*/
-
     $cityMarkers = [];
     $airportMarkers = [];
 
     // Base URLs for Geonames API
-    $geoUsername = "flightltd"; // Replace with your Geonames username
+    $geoUsername = "flightltd";
     $citiesUrl = "http://api.geonames.org/searchJSON?formatted=true&q=city&country=$country&maxRows=25&lang=en&username=$geoUsername&style=full";
     $airportsUrl = "http://api.geonames.org/searchJSON?formatted=true&q=airport&country=$country&maxRows=25&lang=en&username=$geoUsername&style=full";
-
-    /*GET CITIES
-    $citiesUrl = "http://api.geonames.org/searchJSON?formatted=true&q=city&maxRows=195&lang=en&username=flightltd&style=full&country=";
-    $citiesResponse = file_get_contents($citiesUrl); // Get city data
-    $citiesData = json_decode($citiesResponse, true);*/
     
     // Fetch and process cities data
-    $citiesResponse = @file_get_contents($citiesUrl); // Suppress warnings with @
+    $citiesResponse = @file_get_contents($citiesUrl);
     if ($citiesResponse) {
         $citiesData = json_decode($citiesResponse, true);
         if (isset($citiesData['geonames']) && count($citiesData['geonames']) > 0) {
@@ -64,7 +52,7 @@
     }
 
     // Fetch and process airports data
-    $airportsResponse = @file_get_contents($airportsUrl); // Suppress warnings with @
+    $airportsResponse = @file_get_contents($airportsUrl);
     if ($airportsResponse) {
         $airportsData = json_decode($airportsResponse, true);
         if (isset($airportsData['geonames']) && count($airportsData['geonames']) > 0) {
@@ -86,7 +74,7 @@
     $filteredCities = array_slice($cityMarkers, 0, 25); // Get up to 25 cities
     $filteredAirports = array_slice($airportMarkers, 0, 25); // Get up to 25 airports
 
-    // Prepare final response
+    // Prepare response
     $output = [
         "status" => [
             "code" => "200",

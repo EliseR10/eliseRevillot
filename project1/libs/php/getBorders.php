@@ -1,5 +1,5 @@
 <?php
-    $geoJsonFile = 'http://127.0.0.1:5500/project1/libs/json/countryBorders.geo.json'; // Replace with your file path
+    $geoJsonFile = 'http://127.0.0.1:5500/project1/libs/json/countryBorders.geo.json';
     $geoJson = file_get_contents($geoJsonFile);
 
     $geoJsonData = json_decode($geoJson, true);
