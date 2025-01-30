@@ -76,7 +76,6 @@
         // Loop through forecast data and group by date and time
         foreach ($forecastData as $forecast) {
             $date = date("Y-m-d", strtotime($forecast['dt_txt'])); // Extract the date
-            $hour = date("H", strtotime($forecast['dt_txt'])); // Extract the hour
             $temp = $forecast['main']['temp'];
             $description = $forecast['weather'][0]['description'];
             $iconCode = $forecast['weather'][0]['icon'];
@@ -84,36 +83,20 @@
             // Initialize the daily forecast if not already set
             if (!isset($dailyForecasts[$date])) {
                 $dailyForecasts[$date] = [
-                    'morning' => null,
-                    'afternoon' => null,
-                    'evening' => null
-                ];
-            }
-    
-            // Assign data based on time of day
-            if ($hour == '06') {
-                $dailyForecasts[$date]['morning'] = [
-                    'temp' => $temp,
+                    'min_temp' => $temp,
+                    'max_temp' => $temp,
                     'description' => $description,
                     'icon' => "https://openweathermap.org/img/wn/{$iconCode}@2x.png"
                 ];
-            } elseif ($hour == '12') {
-                $dailyForecasts[$date]['afternoon'] = [
-                    'temp' => $temp,
-                    'description' => $description,
-                    'icon' => "https://openweathermap.org/img/wn/{$iconCode}@2x.png"
-                ];
-            } elseif ($hour == '18') {
-                $dailyForecasts[$date]['evening'] = [
-                    'temp' => $temp,
-                    'description' => $description,
-                    'icon' => "https://openweathermap.org/img/wn/{$iconCode}@2x.png"
-                ];
+            } else {
+                // Update min and max temp
+                $dailyForecasts[$date]['min_temp'] = min($dailyForecasts[$date]['min_temp'], $temp);
+                $dailyForecasts[$date]['max_temp'] = max($dailyForecasts[$date]['max_temp'], $temp);
             }
         }
     
         // Limit to the next 3 days
-        $limitedForecasts = array_slice($dailyForecasts, 0, 3);
+        $limitedForecasts = array_slice($dailyForecasts, 0, 3, true); //true to preserve keys
     
         $output['status']['code'] = "200";
         $output['status']['name'] = "ok";

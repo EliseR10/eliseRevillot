@@ -474,89 +474,6 @@ L.easyButton({
     }]
 }).addTo(map);
 
-L.easyButton({
-    id: "mapBtn",
-    position: "bottomleft",
-    states: [{
-        icon: 'fas fa-temperature-low',
-        title: 'Weather Information',
-        onClick: function() {
-            //Get latitude and longitude from the chosen country
-            const selectedCountry = $('#countrySelect').val();
-
-            if(selectedCountry === "Select a country") {
-                Swal.fire({
-                    title: 'No country selected',
-                    text: 'Please select a country from the dropdown before proceeding.',
-                    icon: 'warning',
-                    confirmButtonText: 'OK'
-                });
-                return; // Stop further execution  
-            }
-
-            if (selectedCountry) {
-                $.ajax({
-                    url: "http://127.0.0.1:5500/project1/libs/json/countries.json",
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(result) {
-                        console.log('Selected country: ', selectedCountry);
-                        const selectedCountryData = result.find(country => country.code === selectedCountry);
-                        console.log('Selected country data: ', selectedCountryData);
-
-                        if (selectedCountryData) {
-                            console.log(selectedCountryData);
-                        } else {
-                            console.log('Country not found in the list.')
-                        }
-                        
-                        //Now get the weather data
-                        $.ajax({
-                            url: "http://localhost/itcareerswitch/project1/libs/php/weather.php",
-                            type: 'GET',
-                            dataType: 'json',
-                            data: {
-                                latitude: selectedCountryData.latitude,
-                                longitude: selectedCountryData.longitude,
-                            },
-                            success: function(result) {
-                                console.log(JSON.stringify(result));
-                                    if (result.status.name === "ok") {
-                                        let forecastHtml = Object.entries(result.data).map(([date, times]) => `
-                                            <h3>${date}</h3>
-                                            <p><strong>Morning:</strong> ${times.morning ? `${times.morning.temp}°C, ${times.morning.description} <img src="${times.morning.icon}" alt="Morning Icon">` : "No data"}</p>
-                                            <p><strong>Afternoon:</strong> ${times.afternoon ? `${times.afternoon.temp}°C, ${times.afternoon.description} <img src="${times.afternoon.icon}" alt="Afternoon Icon">` : "No data"}</p>
-                                            <p><strong>Evening:</strong> ${times.evening ? `${times.evening.temp}°C, ${times.evening.description} <img src="${times.evening.icon}" alt="Evening Icon">` : "No data"}</p>
-                                            <hr>
-                                        `).join("");
-                                    
-                                        Swal.fire({
-                                            title: "3-Day Weather Forecast",
-                                            html: forecastHtml,
-                                            icon: "info"
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            title: "Error",
-                                            text: result.status.description,
-                                            icon: "warning"
-                                        });
-                                    }
-                                    
-                                
-                            },
-                            error: function(jqXHR, textStatus, errorThrown) {
-                                console.error(textStatus, errorThrown, jqXHR.responseText);
-                                $().html("Error, unable to fetch data.");
-                            }
-                        });
-                    }
-                });
-            }   
-        }
-    }]
-}).addTo(map);
-
 var infoBtn = L.easyButton("fa-info fa-xl", function (btn, map) {
     // Open the modal when the button is clicked
     $("#countryModal").modal("show");
@@ -600,5 +517,100 @@ var infoBtn = L.easyButton("fa-info fa-xl", function (btn, map) {
 
 // Add the button to the map
 infoBtn.addTo(map);
+
+var weatherBtn = L.easyButton("fas fa-temperature-low fa-xl", function (btn, map) {
+    // Open the modal when the button is clicked
+    $("#weatherModal").modal("show");
+
+    //Get latitude and longitude from the chosen country
+            const selectedCountry = $('#countrySelect').val();
+
+            if (selectedCountry) {
+                $.ajax({
+                    url: "http://127.0.0.1:5500/project1/libs/json/countryBorders.geo.json",
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(result) {
+                        const country = result.features.find(feature => feature.properties.iso_a2 === selectedCountry);
+                        
+                        if (country) {
+                            let coordinates = country.geometry.coordinates; // GeoJSON structure
+                            let firstPolygon = coordinates[0]; // First polygon of the country
+
+                            // If the country has multiple polygons, we need to check for nesting
+                            while (Array.isArray(firstPolygon[0][0])) {
+                                firstPolygon = firstPolygon[0]; 
+                            }
+
+                            let firstCoordinate = firstPolygon[0]; // Get the first point in the polygon
+                            let longitude = firstCoordinate[0];
+                            let latitude = firstCoordinate[1];
+                    
+                            console.log(`Country: ${country.properties.name}, Lat: ${latitude}, Lon: ${longitude}`);
+                                           
+                            //Now get the weather data
+                            $.ajax({
+                                url: "http://localhost/itcareerswitch/project1/libs/php/weather.php",
+                                type: 'GET',
+                                dataType: 'json',
+                                data: {
+                                    latitude: latitude,
+                                    longitude: longitude
+                                },
+                                success: function(result) {
+                                    console.log(JSON.stringify(result));
+                                    if (result.status.name === "ok") {
+                                        let forecastData = result.data;
+                                        let forecastDates = Object.keys(forecastData);
+
+                                        if (forecastDates.length < 3) {
+                                            console.warn("Not enough forecast data available!");
+                                            return;
+                                        }
+                                        
+                                       // TODAY (First Day in Forecast)
+                                        let today = forecastData[forecastDates[0]];
+                                        $("#todayConditions").text(today.description);
+                                        $("#todayIcon").attr("src", today.icon).attr("alt", today.description);
+                                        $("#todayMaxTemp").text(Math.round(today.max_temp));
+                                        $("#todayMinTemp").text(Math.round(today.min_temp));
+
+                                        // DAY +1
+                                        let day1 = forecastData[forecastDates[1]];
+                                        $("#day1Date").text(formatDate(forecastDates[1])); // Format to readable date
+                                        $("#day1Icon").attr("src", day1.icon).attr("alt", day1.description);
+                                        $("#day1MaxTemp").text(Math.round(day1.max_temp));
+                                        $("#day1MinTemp").text(Math.round(day1.min_temp));
+
+                                        // DAY +2
+                                        let day2 = forecastData[forecastDates[2]];
+                                        $("#day2Date").text(formatDate(forecastDates[2]));
+                                        $("#day2Icon").attr("src", day2.icon).attr("alt", day2.description);
+                                        $("#day2MaxTemp").text(Math.round(day2.max_temp));
+                                        $("#day2MinTemp").text(Math.round(day2.min_temp));
+                                    }
+                                },
+                                error: function () {
+                                    console.error("Failed to fetch weather data");
+                                }                           
+                            });
+                        
+                        } else {
+                            console.log("Country not found in GeoJSON!");
+                        }
+                        
+                        // Function to format date (e.g., "2024-02-01" → "Thu 1st")
+                        function formatDate(dateStr) {
+                            let date = new Date(dateStr);
+                            let options = { weekday: 'short', day: 'numeric', month: 'short' };
+                            return date.toLocaleDateString('en-GB', options);
+                        }
+                    }
+                })
+            }    
+});
+
+// Add the button to the map
+weatherBtn.addTo(map);
 
 })
