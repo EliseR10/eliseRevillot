@@ -61,18 +61,19 @@ function success(position) {
 
     //Reverse geocode to get the user's country
     $.ajax({
-        url: `./libs/json/countries.json`,
+        url: `./libs/json/countryBorders.geo.json`,
         type: 'GET',
         dataType: 'json',
         success: function (countries) {
-            const closestCountry = getClosestCountry(userLat, userLng, countries); // ISO2 country code
+            const userCountry = getUserCountry(userLat, userLng, countries); // ISO2 country code
             
-            if (closestCountry) {
-                const userCountryCode = closestCountry.code;
-                console.log('User Country Code:', userCountryCode);
+            if (userCountry) {
+                console.log('User Country Code:', userCountry);
 
                 // Trigger the dropdown change to zoom to the user's country
-                $('#countrySelect').val(userCountryCode).trigger('change');
+                $('#countrySelect').val(userCountry).trigger('change');
+            } else {
+                console.error('Could not determine user country.');
             }
         },
         error: function (xhr, status, error) {
@@ -85,26 +86,17 @@ function error(err) {
     console.warn(`ERROR(${err.code}): ${err.message}`);
 }
 
-function getClosestCountry(userLat, userLng, countries) {
-    // Loop through the countries to find the one with the closest match
-    for (let i = 0; i < countries.length; i++) {
-        const country = countries[i];
-        
-        // Check if the coordinates of the country are very close to the user's location
-        if (isCloseEnough(userLat, userLng, country.latitude, country.longitude)) {
-            return country;  // return the country that matches
+/* Function to check if user is inside a country's polygon */
+function getUserCountry(lat, lng, geoJsonData) {
+    const userPoint = turf.point([lng, lat]); // Convert to GeoJSON point to work with turf
+
+    for (const feature of geoJsonData.features) {
+        const countryPolygon = feature.geometry;
+        if (turf.booleanPointInPolygon(userPoint, countryPolygon)) { //return true if user inside the country
+            return feature.properties.iso_a2; // Return ISO2 country code if above true
         }
     }
-
-    return null; // No country found close enough
-}
-
-function isCloseEnough(userLat, userLng, countryLat, countryLng) {
-    // Allow a certain tolerance for matching coordinates (e.g., within 5 degrees)
-    const latTolerance = 5; // Can be adjusted based on your needs
-    const lngTolerance = 5;
-
-    return Math.abs(userLat - countryLat) <= latTolerance && Math.abs(userLng - countryLng) <= lngTolerance;
+    return null; // No match found
 }
 
 /*COUNTRY SELECTION*/
