@@ -1,11 +1,9 @@
-// ---------------------------------------------------------
-// GLOBAL DECLARATIONS
-// ---------------------------------------------------------
+$(document).ready(function () {
+    $('#preloader').show(); // Show preloader while loading
 
 var map;
 
 // tile layers
-
 var streets = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
     attribution: "Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012"
   }
@@ -22,22 +20,14 @@ var basemaps = {
 };
 
 // buttons
-
 var infoBtn = L.easyButton("fa-info fa-xl", function (btn, map) {
   $("#exampleModal").modal("show");
 });
 
-// ---------------------------------------------------------
-// EVENT HANDLERS
-// ---------------------------------------------------------
 
-// initialise and add controls once DOM is ready
-
-$(document).ready(function () {
-  
-  map = L.map("map", {
+map = L.map("map", {
     layers: [streets]
-  }).setView([54.5, -4], 6);
+}).setView([54.5, -4], 6);
   
   // setView is not required in your application as you will be
   // deploying map.fitBounds() on the country border polygon
@@ -70,20 +60,26 @@ function success(position) {
             if (userCountry) {
                 console.log('User Country Code:', userCountry);
 
-                // Trigger the dropdown change to zoom to the user's country
+                //Trigger the dropdown change to zoom to the user's country
                 $('#countrySelect').val(userCountry).trigger('change');
+                $('#preloader').hide();
+                console.log('Preloader taken off');
+
             } else {
                 console.error('Could not determine user country.');
+                $('#preloader').hide();
             }
         },
         error: function (xhr, status, error) {
             console.error("Error reverse geocoding location:", error);
+            $('#preloader').hide();
         }
     });
 }
 
 function error(err) {
     console.warn(`ERROR(${err.code}): ${err.message}`);
+    $('#preloader').hide();
 }
 
 /* Function to check if user is inside a country's polygon */
