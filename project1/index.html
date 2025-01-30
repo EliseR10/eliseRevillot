@@ -6,20 +6,20 @@
 
         <!--Leaflet Map-->
         <link rel="stylesheet" href="libs/leaflet/leaflet.css" />
-        <!--Font Awesome-->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
         <!--EasyButton Leaflet-->
         <link rel="stylesheet" href="libs/leaflet/easy-button.css">
         <!--Bootstrap-->
         <link rel="stylesheet" href="./libs/css/BootstrapCSS/bootstrap.min.css">
-        <!--fix favicon error-->
+        <!--FontAwesome-->
+        <link rel="stylesheet" href="./libs/css/FontAwesome/fontawesome-free-6.7.2-web/css/all.css">
+        <!--Favicon-->
         <link rel="apple-touch-icon" sizes="180x180" href="./libs/favicon/apple-touch-icon.png">
         <link rel="icon" type="image/png" sizes="32x32" href="./libs/favicon/favicon-32x32.png">
         <link rel="icon" type="image/png" sizes="16x16" href="./libs/favicon/favicon-16x16.png">
         <link rel="manifest" href="/site.webmanifest">
         <!--SweetAlert2-->
         <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!--Delete when modal implemented-->
         <!--CSS file-->
         <link rel="stylesheet" type="text/css" href="libs/css/gazetteer.css">
 
@@ -39,7 +39,63 @@
                 </select>
             </span>
           
-            <div id="map"></div>
+            <div id="map">
+                <!--Country Information-->
+                <div id="countryModal" class="modal" data-bs-backdrop="false" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                      <div class="modal-content shadow">
+                        <div class="modal-header bg-success bg-gradient text-white">
+                          <h5 class="modal-title">Country Information</h5>
+                          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <table class="table table-striped">
+                            <tr>
+                              <td class="text-center"><i class="fa-solid fa-landmark-dome fa-xl text-success"></i></td>
+                              <td class="data">Capital</td>
+                              <td class="text-end data" id="capital">Loading...</span></td>
+                            </tr>
+
+                            <tr>
+                              <td class="text-center"><i class="fa-solid fa-globe fa-xl text-success"></i></td>
+                              <td class="data">Region</td>                
+                              <td class="text-end data" id="region">Loading...</td>                  
+                            </tr>
+                            
+                            <tr>
+                              <td class="text-center"><i class="fa-solid fa-map-location-dot fa-xl text-success"></i></td>
+                              <td class="data">Subregion</td>             
+                              <td class="text-end data" id="subregion">Loading...</td>              
+                            </tr>
+
+                            <tr>
+                              <td class="text-center"><i class="fa-solid fa-tower-broadcast fa-xl text-success"></i></td>
+                              <td class="data">Area</td>
+                              <td class="text-end data" id="area">Loading...</td>
+                            </tr>
+
+                            <tr>
+                              <td class="text-center"><i class="fa-solid fa-street-view fa-xl text-success"></i></td>
+                              <td class="data">Population</td>
+                              <td class="text-end data" id="population">Loading...</td>            
+                            </tr>
+
+                            <tr>
+                              <td class="text-center"><i class="fa-solid fa-language fa-xl text-success"></i></td>
+                              <td class="data">Language Spoken</td>
+                              <td class="text-end data" id="language">Loading...</td>
+                            </tr>
+
+                          </table>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     
        
@@ -50,9 +106,8 @@
 
     <!-- MarkerCluster JS -->
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-    
-    <script src="./libs/js/BootstrapJS/bootstrap.min.js"></script>
     <script src="./libs/js/jquery-3.7.1.js"></script>
+    <script src="./libs/js/BootstrapJS/bootstrap.min.js"></script>
     <script src="./libs/js/turf.min.js"></script>
     <script src="./libs/js/gazetteer.js"></script>
 

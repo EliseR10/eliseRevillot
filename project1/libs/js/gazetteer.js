@@ -19,10 +19,12 @@ var basemaps = {
   "Satellite": satellite
 };
 
-// buttons
+/*buttons
 var infoBtn = L.easyButton("fa-info fa-xl", function (btn, map) {
-  $("#exampleModal").modal("show");
-});
+  $("#countryModal").modal("show");
+
+
+});*/
 
 
 map = L.map("map", {
@@ -555,65 +557,48 @@ L.easyButton({
     }]
 }).addTo(map);
 
-L.easyButton({
-    id: "mapBtn",
-    position: "bottomleft",
-    states: [{
-        icon: 'fas fa-circle-info',
-        title: 'Country Information',
-        onClick: function() {
-            const selectedCountry = $('#countrySelect').val();
+var infoBtn = L.easyButton("fa-info fa-xl", function (btn, map) {
+    // Open the modal when the button is clicked
+    $("#countryModal").modal("show");
 
-            if(selectedCountry === "Select a country") {
-                Swal.fire({
-                    title: 'No country selected',
-                    text: 'Please select a country from the dropdown before proceeding.',
-                    icon: 'warning',
-                    confirmButtonText: 'OK'
-                });
-                return; // Stop further execution  
+    const selectedCountry = $('#countrySelect').val();
+    // AJAX request to fetch country information using the selected country
+    $.ajax({
+        url: 'http://localhost/itcareerswitch/project1/libs/php/countryInfo.php', // Your PHP script that provides the country data
+        method: 'GET',
+        data: { country: selectedCountry }, // Pass the selected country code
+        success: function (response) {
+
+            if (response.status.code === "200" && response.status.name === "ok") {
+                // Access the country data from the 'data' key
+                const countryData = response.data;
+
+                const formattedPopulation = new Intl.NumberFormat().format(countryData.population);
+                const formattedArea = new Intl.NumberFormat().format(countryData.area);
+
+                $('#capital').text(countryData.capital || 'N/A');
+                $('#region').text(countryData.region || 'N/A');
+                $('#subregion').text(countryData.subregion || 'N/A');
+                $('#area').text(formattedArea + " km²"|| 'N/A');
+                $('#population').text(formattedPopulation || 'N/A');
+                $('#language').text(countryData.language || 'N/A');
+
+                
             }
-            
-            if (selectedCountry) {
-                $.ajax({
-                    url: "http://localhost/itcareerswitch/project1/libs/php/countryInfo.php",
-                    type: 'GET',
-                    dataType: 'json',
-                    data: {
-                        country: selectedCountry
-                    },
-                    success: function(result) {
-                        console.log('Selected country: ', selectedCountry);
-
-                        if (result.status.name === "ok") {
-                            //SweetAlert2 popup
-                            Swal.fire({
-                                title: `Information about ${result.data.countryName}`,
-                                html: `
-                                    <p><strong>Capital of the country:</strong> ${result.data.capital}</p>
-                                    <p><strong>Region:</strong> ${result.data.region}</p>
-                                    <p><strong>Subregion:</strong> ${result.data.subregion}</p>
-                                    <p><strong>Area:</strong> ${result.data.area} km²</p>
-                                    <p><strong>Total population:</strong> ${result.data.population}</p>
-                                    <p><strong>Language spoken:</strong> ${result.data.language}</p>
-                                `,
-                                icon: 'info'
-                            });
-                        } else {
-                            Swal.fire({
-                                title: 'Error',
-                                text: result.status.description,
-                                icon: 'error'
-                            });
-                        }
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.error(textStatus, errorThrown, jqXHR.responseText);
-                            $().html("Error, unable to fetch data.");
-                    } 
-                });
-            }   
+        },
+        error: function (xhr, status, error) {
+            console.error('Error fetching country data: ', error);
+            $('#capital').text('Error');
+            $('#region').text('Error');
+            $('#subregion').text('Error');
+            $('#area').text('Error');
+            $('#population').text('Error');
+            $('#language').text('Error');
         }
-    }]
-}).addTo(map);
+    });
+});
+
+// Add the button to the map
+infoBtn.addTo(map);
+
 })
