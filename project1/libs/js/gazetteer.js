@@ -152,7 +152,7 @@ $('#countrySelect').change(function () {
     if (selectedCountry) {
         // Fetch GeoJSON data again to find the selected country's geometry
         $.ajax({
-            url: "http://localhost/itcareerswitch/project1/libs//php/getBorders.php",
+            url: "http://localhost/itcareerswitch/project1/libs/php/getBorders.php",
             type: 'GET',
             dataType: 'json',
             data: {country: selectedCountry},
@@ -162,7 +162,7 @@ $('#countrySelect').change(function () {
                     return;
                 }
 
-                const selectedFeature = result.geometry;
+                const selectedFeature = result.feature;
 
                 if (selectedFeature) {
                     if (countryBorderLayer) {

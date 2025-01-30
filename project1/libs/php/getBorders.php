@@ -27,7 +27,7 @@
     $countryGeometry = null;
     foreach ($geoJsonData['features'] as $feature) {
         if ($feature['properties']['iso_a2'] === $country || $feature['properties']['name'] === $country) {
-            $countryGeometry = $feature['geometry'];
+            $countryGeometry = $feature;
             break;
         }
     }
@@ -43,6 +43,6 @@
     echo json_encode([
         "status" => "success",
         "country" => $country,
-        "geometry" => $countryGeometry
+        "feature" => $countryGeometry
     ]);
 ?>
