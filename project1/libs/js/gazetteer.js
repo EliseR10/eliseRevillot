@@ -110,7 +110,7 @@ function isCloseEnough(userLat, userLng, countryLat, countryLng) {
 /*COUNTRY SELECTION*/
 //Populate the dropdown when the page loads
 $.ajax({
-    url: "http://127.0.0.1:5500/project1/libs/json/countryBorders.geo.json",
+    url: "http://localhost/itcareerswitch/project1/libs/php/countrySelection.php",
     type: 'GET',
     dataType: 'json',
     success: function (result) {
@@ -118,16 +118,11 @@ $.ajax({
         const countryOptions = [];
 
         //Get country names and ISO2 codes
-        result.features.forEach(function (country) {
+        result.forEach(function (country) {
             countryOptions.push({
-                name: country.properties.name,
-                iso2: country.properties.iso_a2
+                name: country.name,
+                iso2: country.iso2
             });
-        });
-
-        //Sort countries alphabetically
-        countryOptions.sort(function (a, b) {
-            return a.name.localeCompare(b.name);
         });
 
         // Populate the dropdown
@@ -140,6 +135,7 @@ $.ajax({
     },
     error: function (xhr, status, error) {
         console.error("Error loading country data:", error);
+        console.log("Response:", xhr.responseText);
         alert("Error loading country data.");
     }
 });
@@ -156,14 +152,17 @@ $('#countrySelect').change(function () {
     if (selectedCountry) {
         // Fetch GeoJSON data again to find the selected country's geometry
         $.ajax({
-            url: "http://127.0.0.1:5500/project1/libs/json/countryBorders.geo.json",
+            url: "http://localhost/itcareerswitch/project1/libs//php/getBorders.php",
             type: 'GET',
             dataType: 'json',
+            data: {country: selectedCountry},
             success: function (result) {
-                // Find the selected country's feature in the GeoJSON
-                const selectedFeature = result.features.find(
-                    feature => feature.properties.iso_a2 === selectedCountry
-                );
+                if (result.status.code === "ok") {
+                    alert("Country not found.");
+                    return;
+                }
+
+                const selectedFeature = result.geometry;
 
                 if (selectedFeature) {
                     if (countryBorderLayer) {

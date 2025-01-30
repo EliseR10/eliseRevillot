@@ -1,5 +1,9 @@
 <?php
-    $geoJsonFile = 'http://127.0.0.1:5500/project1/libs/json/countryBorders.geo.json';
+    header("Access-Control-Allow-Origin: *"); // Allow all origins
+    header("Access-Control-Allow-Methods: GET, POST, OPTIONS"); // Allow specific methods
+    header("Access-Control-Allow-Headers: Content-Type, Authorization, User-Agent"); // Allow specific headers
+
+    $geoJsonFile = '../json/countryBorders.geo.json';
     $geoJson = file_get_contents($geoJsonFile);
 
     $geoJsonData = json_decode($geoJson, true);
