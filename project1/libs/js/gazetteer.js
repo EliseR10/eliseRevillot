@@ -613,4 +613,64 @@ var weatherBtn = L.easyButton("fas fa-temperature-low fa-xl", function (btn, map
 // Add the button to the map
 weatherBtn.addTo(map);
 
+var newsBtn = L.easyButton("fa-regular fa-newspaper fa-xl", function (btn, map) {
+    $("#newsModal").modal("show");
+    
+    const selectedCountry = $('#countrySelect').val();
+    console.log(selectedCountry);
+
+    if (selectedCountry) {
+        $.ajax({
+            url: "http://localhost/itcareerswitch/project1/libs/php/links.php",
+            type: 'GET',
+            dataType: 'json',
+            data: {
+                country: selectedCountry
+            },
+            success: function(result) {
+                console.log('AJAX response: ', result);
+                if (result.status.name === "ok") {
+
+                    let articles = result.data;
+                    let modalBody = $("#news");
+
+                    modalBody.empty(); // Clear existing content
+
+                    console.log(articles);
+
+                    articles.forEach(article => {
+                        let articleHTML = `
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td rowspan="2" width="50%">
+                                        <img class="img-fluid rounded" src="${article.image}" alt="${article.title}" title="${article.title}">
+                                    </td>
+                                    <td>
+                                        <a href="${article.link}" class="fw-bold fs-6 text-black" target="_blank">${article.title}</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="align-bottom pb-0">
+                                        <p class="fw-light fs-6 mb-1">${article.source}</p>
+                                    </td>            
+                                </tr>
+                            </table>
+                        `;
+        
+                        modalBody.append(articleHTML);
+                    });
+                } else {
+                    $(".modal-body").html("<p>No articles available.</p>");     
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error(textStatus, errorThrown, jqXHR.responseText);
+                $(".modal-body").html("<p>Error fetching news.</p>");
+            } 
+        });
+    }   
+})
+//Add the button to the map
+newsBtn.addTo(map);
+
 })

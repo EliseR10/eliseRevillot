@@ -46,7 +46,7 @@
         exit;
     }
 
-    $url = "https://newsdata.io/api/1/latest?apikey=${API_KEY}&country=${country}";
+    $url = "https://newsdata.io/api/1/latest?apikey=${API_KEY}&country=${country}&language=en";
     
     /*cURL request */
 	$ch = curl_init(); 
@@ -67,26 +67,28 @@
 	$output['status']['description'] = "success";
 	$output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
 	$output['data'] = [];
-
+    
     //Check if articles are available
     if (isset($decode['results']) && count($decode['results']) > 0) {
-        $result = $decode['results'][0];
+        $result = array_slice($decode['results'], 0, 4);
 
+        foreach ($result as $article) {
         //Add the first article to the output
-        $output['data'] = [
-            'title' => $result['title'] ?? 'No title available',
-            'description' => $result['description'] ?? 'No description available',
-            'link' => $result['link'] ?? 'No link available',
-            'pubDate' => $result['pubDate'] ?? 'No published date available'
-        ];
+            $output['data'][] = [
+                'title' => $article['title'] ?? 'No title available',
+                'link' => $article['link'] ?? 'No link available',
+                'image' => $article['image_url'] ?? './libs/no-image.png',
+                'source' => isset($article['source_id']) ? ucwords(str_replace('-', ' ', $article['source_id'])) : 'No source available'
+            ];
+        }
     } else {
-        $output['status']['code'] = 404;
-        $output['status']['name'] = "error";
-        $output['status']['description'] = "No articles found for the given country.";
-        $output['data'] = [];
-        exit;
+            $output['status']['code'] = 404;
+            $output['status']['name'] = "error";
+            $output['status']['description'] = "No articles found for the given country.";
+            $output['data'] = [];
+            exit;
     }
-	
+    
 	header('Content-Type: application/json; charset=UTF-8'); 
 	echo json_encode($output);
 
