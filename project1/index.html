@@ -190,6 +190,59 @@
                     </div>               
                   </div>
 
+
+                  <!--Currency Information-->
+                  <div id="currencyModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
+                      <div class="modal-content shadow">
+
+                            <div class="modal-header bg-secondary bg-gradient text-white">
+                              <h5 class="modal-title">Currency calculator</h5>
+                              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                      
+                            <div class="modal-body">
+                              <form>
+                                <!--Currency Information-->
+                                <div class="form-floating mb-3">
+                                  <table>
+                                  <tr>
+                                    <td class="text-center" id="currencyName"></td>
+                                    <td class="text-center" id="currencyCode"></td>
+                                  </tr>
+                                  </table>
+                                </div>
+
+                                <!--From USD-->
+                                <div class="form-floating mb-3">
+                                  <input id="fromAmount" type="number" class="form-control" value="1" min="1" step="1">
+                                  <label>From USD</label>
+                                </div>
+                                
+                                <!--To-->
+                                <div class="form-floating mb-3">
+                                  <div id="exchangeRate" class="form-select"></div>
+                                  <label for="exchangeRate">Convert to</label>
+                                </div>
+                                
+                                <!--Result-->
+                                <div class="form-floating">
+                                  <input id="toAmount" type="text" class="form-control" disabled>
+                                  <label for="toAmount">Result</label>
+                                </div>
+                              </form>
+                            </div>
+                      
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-outline-secondary btn-sm myBtn" data-bs-dismiss="modal">CLOSE</button>
+                            </div>
+                      
+                          </div>
+                      
+                        </div>
+                      
+                      </div>
+
                   <!--News Modal-->
                   <div id="newsModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">

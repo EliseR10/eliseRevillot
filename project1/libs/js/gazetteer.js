@@ -277,94 +277,7 @@ const overlayMaps = {
 
 L.control.layers(null, overlayMaps, {collapsed: false}).addTo(map);
 
-/*EASY BUTTON MAP*/
-L.easyButton({
-    id: "mapBtn",
-    position: "bottomleft",
-    states: [{
-        icon: 'fas fa-money-bill-1',
-        title: 'Currency',
-        onClick: function() {
-            const selectedCountry = $('#countrySelect').val();
-
-            if(selectedCountry === "Select a country") {
-                Swal.fire({
-                    title: 'No country selected',
-                    text: 'Please select a country from the dropdown before proceeding.',
-                    icon: 'warning',
-                    confirmButtonText: 'OK'
-                });
-                return; // Stop further execution  
-            }
-
-            if (selectedCountry) {
-                $.ajax({
-                    url: "http://localhost/itcareerswitch/project1/libs/php/currency.php",
-                    type: 'GET',
-                    dataType: 'json',
-                    data: {
-                        country: selectedCountry
-                    },
-                    success: function(result) {
-                        console.log('Selected country: ', selectedCountry);
-
-                        if (result.status.name === "ok") {
-                            //SweetAlert2 popup
-                            Swal.fire({
-                                title: `<i class="fa-solid fa-coins"></i> ${result.data.currencyName}`,
-                                
-                                html: `
-                                    <p><strong>Currency:</strong> ${result.data.currencyCode}</p>
-                                    <p><strong>Currency Symbole:</strong> ${result.data.currencySymbole}</p>
-                                    <p><strong>Currency Exchange</strong> £1 = ${result.data.exchangeRate}${result.data.currencySymbole}</p>
-
-                                    <!--Input for amount-->
-                                    <div>
-                                        <label for="amount"></label>
-                                        <input id="amount" type="number" class="swal2-input" placeholder="Amount in GBP" min="1">
-
-                                        <!--Input for result-->
-                                        <label for="conversion"></label>
-                                        <input id="conversion" type="number" class="swal2-input" placeholder="Amount in ${result.data.currencyCode}" readonly min="1">
-                                    </div>
-                                `,
-                                icon: 'info',
-                                didOpen: () => {
-                                    const amountInput = document.getElementById('amount');
-                                    const conversionInput = document.getElementById('conversion');
-                                    const exchangeRate = result.data.exchangeRate;
-                        
-                                    // Event listener to update the conversion field on input change
-                                    amountInput.addEventListener('input', function() {
-                                        const amount = parseFloat(amountInput.value);
-                                        if (!isNaN(amount)) {
-                                            const convertedAmount = (amount * exchangeRate).toFixed(2);  // Calculate conversion
-                                            conversionInput.value = convertedAmount;  // Update the result
-                                        } else {
-                                            conversionInput.value = '';  // Clear the result if input is invalid
-                                        }
-                                    });
-                                }
-                            });
-
-                        } else {
-                            Swal.fire({
-                                title: 'Error',
-                                text: 'No currency are available for the selected country.',
-                                icon: 'warning'
-                            });
-                        }
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.error(textStatus, errorThrown, jqXHR.responseText);
-                            $().html("Error, unable to fetch data.");
-                    }
-                });
-            }
-        }
-    }]
-}).addTo(map);
-
+/*BUTTONS*/
 var infoBtn = L.easyButton("fa-info fa-xl", function (btn, map) {
     // Open the modal when the button is clicked
     $("#countryModal").modal("show");
@@ -503,6 +416,54 @@ var weatherBtn = L.easyButton("fas fa-temperature-low fa-xl", function (btn, map
 
 // Add the button to the map
 weatherBtn.addTo(map);
+
+var currencyBtn = L.easyButton("fas fa-money-bill-1 fa-xl", function (btn, map) {
+    $("#currencyModal").modal("show");
+  
+    const selectedCountry = $('#countrySelect').val();
+
+            if (selectedCountry) {
+                $.ajax({
+                    url: "http://localhost/itcareerswitch/project1/libs/php/currency.php",
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        country: selectedCountry
+                    },
+                    success: function(result) {
+                        console.log('Selected country: ', selectedCountry);
+
+                        if (result.status.name === "ok") {
+                            $('#currencyName').text('Currency Code: ' + result.data.currencyCode);
+                            $('#currencyCode').text('(' + result.data.currencySymbol + ')');
+                            $('#exchangeRate').text(result.data.currencyCode);
+
+                            // Add event listener to perform currency conversion
+                            const exchangeRate = result.data.exchangeRate;
+                            const oneDollarConverted = (1 * exchangeRate).toFixed(2);
+
+                            // Prepopulate the result input field with the conversion from 1 USD
+                            $('#toAmount').val(oneDollarConverted);
+
+                            // Handle changes to the amount input (in case the user wants to enter a different amount)
+                            $('#fromAmount').val(1); // Set default to 1
+                            $('#fromAmount').on('input', function() {
+                                const fromAmount = parseFloat($(this).val());
+
+                            if (!isNaN(fromAmount)) {
+                                const toAmount = (fromAmount * exchangeRate).toFixed(2);
+                                $('#toAmount').val(toAmount); // Update result field
+                            } else {
+                                $('#toAmount').val(''); // Clear result if input is invalid
+                            }
+                            })
+                        }
+                    }
+                })    
+            }
+});
+
+currencyBtn.addTo(map);
 
 var newsBtn = L.easyButton("fa-regular fa-newspaper fa-xl", function (btn, map) {
     $("#newsModal").modal("show");

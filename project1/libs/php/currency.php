@@ -92,7 +92,7 @@
 	$output['data'] = [
         "currencyCode" => $currencyCode ?? 'N/A',
         "currencyName" => $currencyDetails['name'] ?? 'N/A',
-        "currencySymbole" => $currencyDetails['symbol'] ?? null,
+        "currencySymbol" => $currencyDetails['symbol'] ?? null,
         "exchangeRate" => $exchangeData['rates'][$currencyCode] ?? 'N/A'
     ];
 	

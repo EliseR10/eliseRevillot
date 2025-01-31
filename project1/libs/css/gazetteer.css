@@ -61,3 +61,11 @@ html, body {
 .data {
     font-size: 15px;
 }
+
+#currencyName {
+    font-size: 17px;
+}
+
+#currencyCode {
+    font-size: 17px;
+}
