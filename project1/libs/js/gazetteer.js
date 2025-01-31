@@ -19,24 +19,11 @@ var basemaps = {
   "Satellite": satellite
 };
 
-/*buttons
-var infoBtn = L.easyButton("fa-info fa-xl", function (btn, map) {
-  $("#countryModal").modal("show");
-
-
-});*/
-
-
 map = L.map("map", {
     layers: [streets]
 }).setView([54.5, -4], 6);
-  
-  // setView is not required in your application as you will be
-  // deploying map.fitBounds() on the country border polygon
 
-  layerControl = L.control.layers(basemaps).addTo(map);
-
-  //infoBtn.addTo(map);
+var layerControl = L.control.layers(basemaps).addTo(map);
 
 /*USER LOCATION*/
 if (navigator.geolocation) {
@@ -177,88 +164,7 @@ $('#countrySelect').change(function () {
                     citiesLayer.clearLayers(); // Clear previous city markers
                     airportsLayer.clearLayers(); // Clear previous airport markers
 
-                    /*MARKERS*/
-                    // Define custom icons for airports and cities
-                    const airportIcon = L.icon({
-                        iconUrl: './libs/plane-departure-solid.svg',
-                        iconSize: [25, 41],
-                        iconAnchor: [12, 41],
-                        popupAnchor: [1, -34],
-                        shadowSize: [41, 41]
-                    });
-
-                    const cityIcon = L.icon({
-                        iconUrl: './libs/tree-city-solid.svg',
-                        iconSize: [40, 40],
-                        iconAnchor: [12, 41],
-                        popupAnchor: [1, -34],
-                        shadowSize: [41, 41]
-                    });
-
-                    // Define custom cluster icons
-                    const clusterIcon = L.divIcon({
-                        className: 'custom-cluster',
-                        html: '<div class="cluster-number"></div>',
-                        iconSize: [40, 40],
-                        iconAnchor: [20, 20],
-                        popupAnchor: [0, -20]
-                    });
-
-                    // Customize the cluster appearance
-                    citiesLayer.options.iconCreateFunction = function(cluster) {
-                        return L.divIcon({
-                            className: 'leaflet-cluster',
-                            html: `<div style="background-color: purple; border-radius: 50%; color: white; font-size: 14px; text-align: center; line-height: 40px; width: 40px; height: 40px;">${cluster.getChildCount()}</div>`,
-                            iconSize: [40, 40]
-                        });
-                    };
-
-                    airportsLayer.options.iconCreateFunction = function(cluster) {
-                        return L.divIcon({
-                            className: 'leaflet-cluster',
-                            html: `<div style="background-color: red; border-radius: 50%; color: white; font-size: 14px; text-align: center; line-height: 40px; width: 40px; height: 40px;">${cluster.getChildCount()}</div>`,
-                            iconSize: [40, 40]
-                        });
-                    };
-
-                    //Fetch marker data and populate layers
-                    function fetchMarkers(countryCode) {
-                        $.ajax({
-                            url: 'http://localhost/itcareerswitch/project1/libs/php/getMarkersData.php',
-                            method: 'GET',
-                            data: { country: countryCode },
-                            success: function (result) {
-                                if (result.status.code === '200') {
-                                    const cities = result.data.cities;
-                                    const airports = result.data.airports;
-
-                                    // Create city markers
-                                    cities.forEach(city => {
-                                        const cityMarker = L.marker([city.lat, city.lng], {icon: cityIcon})
-                                            .bindPopup(`<b>City:</b> ${city.name}`);
-                                        citiesLayer.addLayer(cityMarker);
-                                    });
-                    
-                                    // Create airport markers
-                                    airports.forEach(airport => {
-                                        const airportMarker = L.marker([airport.lat, airport.lng], {icon: airportIcon})
-                                            .bindPopup(`<b>Airport:</b> ${airport.name}`);
-                                        airportsLayer.addLayer(airportMarker);
-                                    });
-
-                                                        
-                                    // Add layers to map through Layer Control
-                                    if (!map.hasLayer(citiesLayer) && !map.hasLayer(airportsLayer)) {
-                                        citiesLayer.addTo(map);
-                                        airportsLayer.addTo(map);
-                                    }
-
-                                } else {
-                                    console.error('Failed to fetch marker data');
-                                }
-                            }
-                        })
-                    }
+                    /*Get Markers*/
                     fetchMarkers(selectedCountry);
                 };
             },
@@ -270,12 +176,70 @@ $('#countrySelect').change(function () {
     }
 });
 
-const overlayMaps = {
-    "Cities": citiesLayer,
-    "Airports": airportsLayer
-};
+//Fetch marker data and populate layers
+function fetchMarkers(countryCode) {
+    $.ajax({
+        url: 'http://localhost/itcareerswitch/project1/libs/php/getMarkersData.php',
+        method: 'GET',
+        data: { country: countryCode },
+        success: function (result) {
+            if (result.status.code === '200') {
+                const cities = result.data.cities;
+                const airports = result.data.airports;
 
-L.control.layers(null, overlayMaps, {collapsed: false}).addTo(map);
+                // Define custom icons for airports and cities
+                const airportIcon = L.ExtraMarkers.icon({
+                    icon: 'fa-solid fa-plane-departure',
+                    markerColor: 'red',
+                    shape: 'square',
+                    prefix: 'fa',
+                    shadowUrl: './leaflet/images/markers_shadow.png'
+                });
+
+                const cityIcon = L.ExtraMarkers.icon({
+                    icon: 'fa-solid fa-landmark-dome',
+                    markerColor: 'purple',
+                    shape: 'square',
+                    prefix: 'fa',
+                    shadowUrl: './leaflet/images/markers_shadow.png'
+                });
+
+                // Create city markers
+                cities.forEach(city => {
+                    const cityMarker = L.marker([city.lat, city.lng], {icon: cityIcon})
+                        .bindTooltip(`<b>City:</b> ${city.name}`);
+                    citiesLayer.addLayer(cityMarker);
+                });
+
+                // Create airport markers
+                airports.forEach(airport => {
+                    const airportMarker = L.marker([airport.lat, airport.lng], {icon: airportIcon})
+                        .bindTooltip(`<b>Airport:</b> ${airport.name}`);
+                    airportsLayer.addLayer(airportMarker);
+                });
+
+                  // Only add marker layers if not already added to the map
+                  if (!map.hasLayer(citiesLayer)) {
+                    citiesLayer.addTo(map);
+                }
+
+                if (!map.hasLayer(airportsLayer)) {
+                    airportsLayer.addTo(map);
+                }
+
+                // Add marker layers to the layer control only once
+                layerControl.removeLayer(citiesLayer);
+                layerControl.removeLayer(airportsLayer);
+
+                layerControl.addOverlay(citiesLayer, "Cities");
+                layerControl.addOverlay(airportsLayer, "Airports");
+
+            } else {
+                console.error('Failed to fetch marker data');
+            }
+        }
+    })
+}
 
 /*BUTTONS*/
 var infoBtn = L.easyButton("fa-info fa-xl", function (btn, map) {
