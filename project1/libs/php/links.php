@@ -73,7 +73,6 @@
         $result = array_slice($decode['results'], 0, 4);
 
         foreach ($result as $article) {
-        //Add the first article to the output
             $output['data'][] = [
                 'title' => $article['title'] ?? 'No title available',
                 'link' => $article['link'] ?? 'No link available',

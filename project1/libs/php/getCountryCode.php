@@ -33,9 +33,6 @@
     curl_close($ch);
 
     if ($result === false || $httpCode !== 200) {
-        // Log the cURL error for better debugging
-        error_log("cURL error: " . curl_error($ch));
-    
         http_response_code(500); // Internal Server Error
         echo json_encode([
             "status" => [
