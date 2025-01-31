@@ -125,11 +125,6 @@ $(document).ready(function () {
                 dataType: 'json',
                 data: {country: selectedCountry},
                 success: function (result) {
-                    if (result.status.code === "ok") {
-                        alert("Country not found.");
-                        return;
-                    }
-
                     const selectedFeature = result.feature;
 
                     if (selectedFeature) {
@@ -235,15 +230,21 @@ $(document).ready(function () {
                     // Only add marker layers if not already added to the map
                     if (!map.hasLayer(citiesLayer)) {
                         citiesLayer.addTo(map);
+                    } else {
+                        map.addLayer(citiesLayer);
                     }
 
                     if (!map.hasLayer(airportsLayer)) {
                         airportsLayer.addTo(map);
+                    } else {
+                        map.addLayer(airportsLayer);
                     }
 
                     // Add marker layers to the layer control only once
-                    layerControl.removeLayer(citiesLayer);
-                    layerControl.removeLayer(airportsLayer);
+                    if (layerControl) {
+                        layerControl.removeLayer(citiesLayer);
+                        layerControl.removeLayer(airportsLayer);
+                    }
 
                     layerControl.addOverlay(citiesLayer, "Cities");
                     layerControl.addOverlay(airportsLayer, "Airports");
