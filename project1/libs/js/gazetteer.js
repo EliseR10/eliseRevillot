@@ -109,8 +109,47 @@ $(document).ready(function () {
     });
 
     // Define marker LayerGroups
-    let citiesLayer = L.markerClusterGroup();
-    let airportsLayer = L.markerClusterGroup();
+    let citiesLayer = L.markerClusterGroup({
+        showConvexHull: true,
+        polygonOptions: {
+            fillColor: "#fff",
+            color: "#000",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.5
+        },
+        iconCreateFunction: function(cluster) {
+            const count = cluster.getChildCount();  // Get the number of markers in this cluster
+            return L.divIcon({
+                className: 'custom-cluster-city',
+                html: `<div style="background-color: purple; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 14px;">${count}</div>`,
+                iconSize: [40, 40],
+                iconAnchor: [20, 20],  // Center the icon on the cluster
+                popupAnchor: [0, -20]
+            });
+        }
+    });
+    let airportsLayer = L.markerClusterGroup({
+        showConvexHull: true,
+        polygonOptions: {
+          fillColor: "#fff",
+          color: "#000",
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0.5
+        },
+        iconCreateFunction: function(cluster) {
+            const count = cluster.getChildCount();  // Get the number of markers in this cluster
+            return L.divIcon({
+                className: 'custom-cluster-airport',
+                html: `<div style="background-color: red; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 14px;">${count}</div>`,
+                iconSize: [40, 40],
+                iconAnchor: [20, 20],  // Center the icon on the cluster
+                popupAnchor: [0, -20]
+            });
+        }
+    });
+
     let countryBorderLayer = null;
 
     //Handle dropdown change
@@ -171,29 +210,6 @@ $(document).ready(function () {
                 if (result.status.code === '200') {
                     const cities = result.data.cities;
                     const airports = result.data.airports;
-
-                    /* Define custom cluster icons*/
-                    citiesLayer.options.iconCreateFunction = function(cluster) {
-                        const count = cluster.getChildCount();  // Get the number of markers in this cluster
-                        return L.divIcon({
-                            className: 'custom-cluster-city',
-                            html: `<div style="background-color: purple; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 14px;">${count}</div>`,
-                            iconSize: [40, 40],
-                            iconAnchor: [20, 20],  // Center the icon on the cluster
-                            popupAnchor: [0, -20]
-                        });
-                    };
-                
-                    airportsLayer.options.iconCreateFunction = function(cluster) {
-                        const count = cluster.getChildCount();  // Get the number of markers in this cluster
-                        return L.divIcon({
-                            className: 'custom-cluster-airport',
-                            html: `<div style="background-color: red; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 14px;">${count}</div>`,
-                            iconSize: [40, 40],
-                            iconAnchor: [20, 20],  // Center the icon on the cluster
-                            popupAnchor: [0, -20]
-                        });
-                    };
 
                     // Define custom icons for airports and cities
                     const airportIcon = L.ExtraMarkers.icon({

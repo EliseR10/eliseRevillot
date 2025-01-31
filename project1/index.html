@@ -6,10 +6,13 @@
 
         <!--Leaflet Map-->
         <link rel="stylesheet" href="libs/leaflet/leaflet.css" />
-        <!--EasyButton Leaflet-->
-        <link rel="stylesheet" href="libs/leaflet/easy-button.css">
+        <!--Leaflet MarkerCluster-->
+        <link rel="stylesheet" href="./libs/leaflet/Leaflet.markercluster-1.4.1/dist/MarkerCluster.css" />
+        <link rel="stylesheet" href="./libs/leaflet/Leaflet.markercluster-1.4.1/dist/MarkerCluster.Default.css" />
         <!--ExtraMarkers Leaflet-->
-        <link rel="stylesheet" href="libs/leaflet/leaflet.extra-markers.css">
+        <link rel="stylesheet" href="libs/leaflet/leaflet.extra-markers.css"/>
+        <!--EasyButton-->
+        <link rel="stylesheet" href="./libs/leaflet/easy-button.css"/>
         <!--Bootstrap-->
         <link rel="stylesheet" href="./libs/css/BootstrapCSS/bootstrap.min.css">
         <!--FontAwesome-->
@@ -20,9 +23,9 @@
         <link rel="icon" type="image/png" sizes="16x16" href="./libs/favicon/favicon-16x16.png">
         <link rel="manifest" href="/site.webmanifest">
         <!--CSS file-->
-        <link rel="stylesheet" type="text/css" href="libs/css/gazetteer.css">
+      <link rel="stylesheet" type="text/css" href="libs/css/gazetteer.css">
 
-        <title>Gazetteer</title>
+      <title>Gazetteer</title>
 
     </head>
     <body>
@@ -95,7 +98,7 @@
                 </div>
 
                 <!--Weather Information-->
-                <div id="weatherModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="weatherModalLabel" aria-hidden="true">
+                <div id="weatherModal" class="modal fade" tabindex="-1" data-bs-backdrop="fals" aria-labelledby="weatherModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">  
                       <div class="modal-content shadow"> 
 
@@ -191,7 +194,7 @@
 
 
                   <!--Currency Information-->
-                  <div id="currencyModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div id="currencyModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
                       <div class="modal-content shadow">
 
@@ -243,7 +246,7 @@
                       </div>
 
                   <!--News Modal-->
-                  <div id="newsModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div id="newsModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                       <div class="modal-content shadow"> 
                         <div class="modal-header bg-danger bg-gradient text-white">
@@ -294,10 +297,10 @@
     <!--Scripts-->
     <script src="libs/leaflet/leaflet.js"></script>
     <script src="libs/leaflet/easy-button.js"></script>
+    <!-- MarkerCluster JS -->
+    <script src="./libs/leaflet/Leaflet.markercluster-1.4.1/dist/leaflet.markercluster.js"></script>
     <script type="module" src="libs/leaflet/leaflet.extra-markers.js"></script>
 
-    <!-- MarkerCluster JS -->
-    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
     <script src="./libs/js/jquery-3.7.1.js"></script>
     <script src="./libs/js/BootstrapJS/bootstrap.min.js"></script>
     <script src="./libs/js/turf.min.js"></script>
