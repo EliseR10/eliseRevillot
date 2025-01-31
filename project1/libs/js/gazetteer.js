@@ -431,6 +431,12 @@ $(document).ready(function () {
                                 $('#toAmount').val(''); // Clear result if input is invalid
                             }
                         })
+
+                        // Reset the currency input fields when the modal is closed
+                        $('#currencyModal').on('hidden.bs.modal', function () {
+                            $('#fromAmount').val(1);  // Reset input field to 1
+                            $('#toAmount').val('');   // Clear the converted amount
+                        });
                     }
                 }
             })    
