@@ -150,9 +150,9 @@ $(document).ready(function () {
                         citiesLayer.clearLayers(); // Clear previous city markers
                         airportsLayer.clearLayers(); // Clear previous airport markers
 
-                        /*Get Markers*/
+                        //Get Markers
                         fetchMarkers(selectedCountry);
-                    };
+                    }
                 },
                 error: function (xhr, status, error) {
                     console.error("Error loading country data:", error);
@@ -160,9 +160,8 @@ $(document).ready(function () {
                 }
             })
         }
-    });
-
-    //Fetch marker data and populate layers
+    })
+    /*Fetch marker data and populate layers*/
     function fetchMarkers(countryCode) {
         $.ajax({
             url: 'http://localhost/itcareerswitch/project1/libs/php/getMarkersData.php',
@@ -265,7 +264,7 @@ $(document).ready(function () {
         
         // AJAX request to fetch country information using the selected country
         $.ajax({
-            url: 'http://localhost/itcareerswitch/project1/libs/php/countryInfo.php', // Your PHP script that provides the country data
+            url: 'http://localhost/itcareerswitch/project1/libs/php/countryInfo.php',
             method: 'GET',
             data: { country: selectedCountry }, // Pass the selected country code
             success: function (response) {
