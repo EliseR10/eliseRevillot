@@ -282,115 +282,6 @@ L.easyButton({
     id: "mapBtn",
     position: "bottomleft",
     states: [{
-        icon: 'fas fa-flag',
-        title: 'Flag',
-        onClick: function() {
-            const selectedCountry = $('#countrySelect').val();
-
-            if (selectedCountry) {
-                $.ajax({
-                    url: "http://localhost/itcareerswitch/project1/libs/php/flag.php",
-                    type: 'GET',
-                    dataType: 'json',
-                    data: {
-                        country: selectedCountry
-                    },
-                    success: function(result) {
-                        console.log('Selected country: ', selectedCountry);
-
-                        if (result.status.name === "ok") {
-                            //SweetAlert2 popup
-                            Swal.fire({
-                                title: `Flag of ${result.data.countryName}`,
-                                html: `
-                                    <img src="${result.data.flag}" alt="${selectedCountry} Flag"/>
-                                `,
-                                icon: 'info'
-                            });
-
-                        } else {
-                            Swal.fire({
-                                title: 'Flag',
-                                text: 'No country selected',
-                                icon: 'warning'
-                            });
-                        }
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.error(textStatus, errorThrown, jqXHR.responseText);
-                            $().html("Error, unable to fetch data.");
-                    } 
-                });
-            }  
-        }
-    }]
-}).addTo(map);
-
-L.easyButton({
-    id: "mapBtn",
-    position: "bottomleft",
-    states: [{
-        icon: 'fas fa-link',
-        title: 'News',
-        onClick: function() {
-            const selectedCountry = $('#countrySelect').val();
-
-            if(selectedCountry === "Select a country") {
-                Swal.fire({
-                    title: 'No country selected',
-                    text: 'Please select a country from the dropdown before proceeding.',
-                    icon: 'warning',
-                    confirmButtonText: 'OK'
-                });
-                return; // Stop further execution  
-            }
-
-            if (selectedCountry) {
-                $.ajax({
-                    url: "http://localhost/itcareerswitch/project1/libs/php/links.php",
-                    type: 'GET',
-                    dataType: 'json',
-                    data: {
-                        country: selectedCountry
-                    },
-                    success: function(result) {
-                        console.log('Selected country: ', selectedCountry);
-
-                        if (result.status.name === "ok") {
-                            
-                            //SweetAlert2 popup
-                            Swal.fire({
-                                    title: `<i class="fa-regular fa-newspaper"></i> Headlines`,
-                                    html: `
-                                        <p><strong>Title:</strong> ${result.data.title}</p>
-                                        <p><strong>Description:</strong> ${result.data.description}</p>
-                                        <p><strong>Link to full article:</strong> ${result.data.link}</p>
-                                        <p><strong>Published on:</strong> ${result.data.pubDate}</p>
-                                    `,
-                                    icon: 'info'
-                                });
-                        } else {
-                            Swal.fire({
-                                title: 'No articles found',
-                                text: 'No articles are available for the selected country.',
-                                icon: 'warning'
-                            });
-                        }
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.error(textStatus, errorThrown, jqXHR.responseText);
-                            $().html("Error, unable to fetch data.");
-                    } 
-                });
-            }   
-        }
-    }]
-}).addTo(map);
-
-L.easyButton({
-    id: "mapBtn",
-    position: "bottomleft",
-    states: [{
         icon: 'fas fa-money-bill-1',
         title: 'Currency',
         onClick: function() {
@@ -672,5 +563,42 @@ var newsBtn = L.easyButton("fa-regular fa-newspaper fa-xl", function (btn, map) 
 })
 //Add the button to the map
 newsBtn.addTo(map);
+
+
+var flagBtn = L.easyButton("fas fa-flag fa-xl", function (btn, map) {
+    $("#flagModal").modal("show");
+    
+    const selectedCountry = $('#countrySelect').val();
+
+        if (selectedCountry) {
+            $.ajax({
+                url: "http://localhost/itcareerswitch/project1/libs/php/flag.php",
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                    country: selectedCountry
+                },
+                success: function(result) {
+                    console.log('Selected country: ', selectedCountry);
+
+                    if (result.status.name === "ok") {
+                        // Set the flag image and country name
+                        $("#flag").html('<img src="' + result.data.flag + '" alt="Country Flag" class="img-fluid" />');
+                    } else {
+                        $("#flag").html('<img src="./libs/no-image.png" alt="No flag available" class="img-fluid" />');
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error(textStatus, errorThrown, jqXHR.responseText);
+                    $().html("Error, unable to fetch data.");
+                    $("#flag").html("Error, unable to fetch data.");
+                }
+            
+            });
+        }
+})
+
+flagBtn.addTo(map);
+
 
 })

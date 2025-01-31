@@ -41,7 +41,7 @@
 	$output['status']['description'] = "success";
 	$output['status']['returnedIn'] = intval((microtime(true) - $executionStartTime) * 1000) . " ms";
 	$output['data'] = [
-        "flag" => $decode[0]['flags']['png'] ?? 'N/A',
+        "flag" => $decode[0]['flags']['png'] ?? './libs/no-image.png',
         "countryName" => $decode[0]['name']['common'] ?? "N/A"
     ];
 	
