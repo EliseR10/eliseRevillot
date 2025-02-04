@@ -29,13 +29,33 @@ $("#searchInp").on("keyup", function () {
   $("#filterBtn").click(function () {
     
     // Open a modal of your own design that allows the user to apply a filter to the personnel table on either department or location
-    
+    const modal = {
+      personnelBtn: '#filterEmployeeModal',
+      departmentsBtn: '#filterDepartmentModal',
+      locationsBtn: '#filterLocationModal',
+    };
+
+    let activeTab = $('.nav-link.active').attr('id'); //grab the id of the current active tab
+
+    if (activeTab && modal[activeTab]) {
+      $(modal[activeTab]).modal("show");
+    }
   });
   
   $("#addBtn").click(function () {
     
     // Replicate the logic of the refresh button click to open the add modal for the table that is currently on display
-    
+    const modal = {
+      personnelBtn: '#addPersonnelModal',
+      departmentsBtn: '#addDepartmentModal',
+      locationsBtn: '#addLocationModal',
+    };
+
+    let activeTab = $('.nav-link.active').attr('id'); //grab the id of the current active tab
+
+    if (activeTab && modal[activeTab]) {
+      $(modal[activeTab]).modal("show");
+    }
   });
   
   $("#personnelBtn").click(function () {
