@@ -1,3 +1,4 @@
+$(document).ready(function() {
 $("#searchInp").on("keyup", function () {
   
     // your code
@@ -144,8 +145,7 @@ $("#refreshBtn").click(function () {
     
   });
 
-/*Get all data*/
-$(document).ready(function() {
+/*DISPLAY EMPLOYEE DATA*/
   $.ajax({
     url: "http://localhost:8080/itcareerswitch/project2/libs/php/getAll.php",
     type: 'GET',
@@ -190,4 +190,52 @@ $(document).ready(function() {
       console.log("Response:", xhr.responseText);
     }
   })
-})
+
+
+/*DISPLAY DEPARTMENT DATA*/
+  $.ajax({
+    url: "http://localhost:8080/itcareerswitch/project2/libs/php/getAllDepartmentsDisplay.php",
+    type: 'GET',
+    dataType: 'json',
+    success: function (result) {
+      console.log('This data is: ', result);
+
+      if (result.status.code === '200')  {
+        const $departmentTableBody = $('#departmentTableBody');
+
+        $.each(result.data, function(index, department) {
+          //create a new row and its columns
+          const $tr = $('<tr></tr>');
+
+          //column for Name/Department/Location/JobTitle/Email/Buttons
+          const $Name = $('<td class="align-middle text-nowrap"></td>').text(`${department.department}`);
+          const $Location = $('<td class="align-middle text-nowrap"></td>').text(`${department.location}`);
+          const $buttonCell = $('<td class="align-middle text-nowrap"></td>');
+
+          //Modify Button
+          const $editButton = $('<button class="btn btn-primary btn-sm button-spacing" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" data-id="' + department.id + '"></button>');
+          $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
+
+          //Delete Button
+          const $deleteButton = $('<button class="btn btn-primary btn-sm button-spacing" data-bs-toggle="modal" data-bs-target="#deleteDepartmentModal" data-id="' + department.id + '"></button>');
+          $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
+
+          //Append the buttons to the button cell
+          $buttonCell.append($editButton).append($deleteButton);
+
+          //Append the columns to the row
+          $tr.append($Name).append($Location).append($buttonCell);
+
+          //Append the row to the table body
+          $departmentTableBody.append($tr);
+        })
+      }
+    },
+    error: function(xhr, status, error) {
+      console.error('Error loading data: ', error);
+      console.log("Response:", xhr.responseText);
+    }
+  })
+
+
+}); //document.ready

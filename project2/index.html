@@ -97,10 +97,18 @@
                 <!--Table content with Department Data-->
                 <div class="tab-pane" id="departments-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
                     <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th class="d-none d-md-table-cell">Department</th>
+                                <th class="d-none d-md-table-cell">Location</th>
+                                <th class="d-none d-md-table-cell">Actions</th>
+                            </tr>
+                        </thead>
+
                         <tbody id="departmentTableBody">
                         <!-- Below is an example row. Create a JS function that interogates the database and dynamically creates the HTML for the table contents. -->
   
-                        <tr>
+                        <!--<tr>
                             <td class="align-middle text-nowrap">Human resources</td>
                             <td class="align-middle text-nowrap d-none d-md-table-cell">London</td>
                             <td class="align-middle text-end text-nowrap">
@@ -111,7 +119,7 @@
                                     <i class="fa-solid fa-trash fa-fw"></i>
                                 </button>
                             </td>
-                        </tr>  
+                        </tr>  -->
                         </tbody>  
                     </table>
                 </div>
