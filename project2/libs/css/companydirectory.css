@@ -24,6 +24,12 @@ tr {
   width: 70px;
 }
 
-.button-spacing {
-  margin-right: 10px;
+/* Ensure Actions column is always aligned to the right */
+th.text-end {
+  padding-right: 40px;
+}
+
+/* Optionally, add some margin or padding to separate buttons */
+button.btn {
+  margin-right: 10px;  /* Adjust as necessary */
 }
