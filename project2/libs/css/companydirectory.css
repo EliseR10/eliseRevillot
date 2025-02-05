@@ -20,6 +20,10 @@ tr {
   cursor: default;
 }
 
-.myBtn {
+.myBtn { /*Save and cancel button*/
   width: 70px;
+}
+
+.button-spacing {
+  margin-right: 10px;
 }
