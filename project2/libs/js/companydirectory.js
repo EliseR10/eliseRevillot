@@ -68,7 +68,6 @@ $("#refreshBtn").click(function () {
   $("#departmentsBtn").click(function () {
     
     // Call function to refresh department table
-    
   });
   
   $("#locationsBtn").click(function () {
@@ -77,6 +76,7 @@ $("#refreshBtn").click(function () {
     
   });
   
+  /*MODIFY EMPLOYEE BUTTON*/
   $("#editPersonnelModal").on("show.bs.modal", function (e) {
     
     $.ajax({
@@ -198,7 +198,6 @@ $("#refreshBtn").click(function () {
     type: 'GET',
     dataType: 'json',
     success: function (result) {
-      console.log('This data is: ', result);
 
       if (result.status.code === '200')  {
         const $departmentTableBody = $('#departmentTableBody');
@@ -243,7 +242,6 @@ $("#refreshBtn").click(function () {
     type: 'GET',
     dataType: 'json',
     success: function (result) {
-      console.log('This data is: ', result);
 
       if (result.status.code === '200')  {
         const $locationTableBody = $('#locationTableBody');
@@ -278,6 +276,75 @@ $("#refreshBtn").click(function () {
     error: function(xhr, status, error) {
       console.error('Error loading data: ', error);
       console.log("Response:", xhr.responseText);
+    }
+  })
+
+  /*Populate location selection in addDepartmentModal*/
+  $('#addDepartmentModal').on('show.bs.modal', function() {
+    $.ajax({
+      url: "http://localhost:8080/itcareerswitch/project2/libs/php/getAllLocations.php",
+      type: 'GET',
+      dataType: 'json',
+      success: function (result) {
+
+        if (result.status.code === '200')  {
+          $.each(result.data, function(index, location) {
+            $('#addDepartmentLocation').append(
+              $('<option>', {
+                value: location.id,
+                text: location.location
+              })
+            );
+          })
+        } else {
+          alert('Error loading locations');
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Error loading data: ', error);
+        console.log("Response:", xhr.responseText);
+      }
+    })
+  })
+
+  /*Add Department when clicking on button save */
+  $('#addDepartmentForm').on('submit', function(event) {
+    event.preventDefault(); // Prevent the form submission (page reload)
+
+    const newDepartment = $('#addDepartmentName').val();
+    const departmentLocation = $('#addDepartmentLocation').val();
+
+    console.log('Department name: ', newDepartment);
+    console.log('Location: ', departmentLocation);
+
+    if (newDepartment && departmentLocation) {
+    $.ajax({
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/insertDepartment.php',
+      type: 'POST',
+      dataType: 'json',
+      data : {
+        name: newDepartment,
+        locationID: departmentLocation
+      },
+      success: function(result) {
+        if (result.status.code === '200') {
+          alert('Department added successfully.');
+
+          //Reset the form inputs
+          $('#addDepartmentName').val('');
+          $('#addDepartmentLocation').val('');
+
+          //Close Modal
+          $('#addDepartmentModal').modal("hide");
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Error loading data: ', error);
+        console.log("Response:", xhr.responseText);
+      }
+    })
+    } else {
+      alert('Please fill in both the department name and select a location.');
     }
   })
 

@@ -1,5 +1,8 @@
 <?php
-
+	header("Access-Control-Allow-Origin: *"); // Allow all origins
+    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS"); // Allow specific methods
+    header("Access-Control-Allow-Headers: Content-Type, Authorization, User-Agent"); // Allow specific headers
+	
 	// example use from browser
 	// http://localhost/companydirectory/libs/php/insertDepartment.php?name=New%20Department&locationID=<id>
 

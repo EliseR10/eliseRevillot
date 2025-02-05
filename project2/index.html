@@ -74,22 +74,10 @@
                                 <th class="text-end d-md-table-cell">Actions</th>
                             </tr>
                         </thead>
+
+                        <!-- Below is an example row. Create a JS function that interogates the database and dynamically creates the HTML for the table contents. -->
                         <tbody id="personnelTableBody">
-                        <!-- Below is an example row. Create a JS function that interogates the database and dynamically creates the HTML for the table contents. 
-                        <tr>
-                            <td class="align-middle text-nowrap">Ace, Tamarra</td>
-                            <td class="align-middle text-nowrap d-none d-md-table-cell">Support</td>
-                            <td class="align-middle text-nowrap d-none d-md-table-cell">Munich</td>
-                            <td class="align-middle text-nowrap d-none d-md-table-cell">tacem@vinaora.com</td>
-                            <td class="text-end text-nowrap">
-                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="23">
-                                    <i class="fa-solid fa-pencil fa-fw"></i>
-                                </button>
-                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="23">
-                                    <i class="fa-solid fa-trash fa-fw"></i>
-                                </button>
-                            </td>
-                        </tr>-->           
+
                         </tbody>
                     </table>
                 </div>
@@ -105,21 +93,9 @@
                             </tr>
                         </thead>
 
-                        <tbody id="departmentTableBody">
                         <!-- Below is an example row. Create a JS function that interogates the database and dynamically creates the HTML for the table contents. -->
-  
-                        <!--<tr>
-                            <td class="align-middle text-nowrap">Human resources</td>
-                            <td class="align-middle text-nowrap d-none d-md-table-cell">London</td>
-                            <td class="align-middle text-end text-nowrap">
-                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" data-id="1">
-                                    <i class="fa-solid fa-pencil fa-fw"></i>
-                                </button>
-                                <button type="button" class="btn btn-primary btn-sm deleteDepartmentBtn" data-bs-toggle="modal" data-id="1" data-bs-target="#deleteDepartmentModal">
-                                    <i class="fa-solid fa-trash fa-fw"></i>
-                                </button>
-                            </td>
-                        </tr>  -->
+                        <tbody id="departmentTableBody">
+
                         </tbody>  
                     </table>
                 </div>
@@ -134,21 +110,10 @@
                             </tr>
                         </thead>
 
-                        <tbody id="locationTableBody">
                         <!-- Below is an example row. Create a JS function that interogates the database and dynamically creates the HTML for the table contents. -->
-  
-                        <!--<tr>
-                            <td class="align-middle text-nowrap">London</td>
-                            <td class="align-middle text-end text-nowrap">
-                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editLocationModal">
-                                    <i class="fa-solid fa-pencil fa-fw"></i>
-                                </button>
-                                <button type="button" class="btn btn-primary btn-sm deleteLocationBtn" data-bs-toggle="modal" data-bs-target="#deleteLocationModal">
-                                    <i class="fa-solid fa-trash fa-fw"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        </tbody>  -->
+                        <tbody id="locationTableBody">
+
+                        </tbody>  
                     </table>
                 </div>
             </div>
@@ -324,7 +289,7 @@
                             <form id="addDepartmentForm">  
                                 <div class="form-floating mb-3">
                                     <input type="text" class="form-control" id="addDepartmentName" placeholder="Department" required>
-                                    <label for="addDepartmentName">Account</label>
+                                    <label for="addDepartmentName">Department</label>
                                 </div> 
 
                                 <div class="form-floating">
