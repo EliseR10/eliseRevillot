@@ -1,23 +1,25 @@
 <?php
-	header("Access-Control-Allow-Origin: *"); // Allow all origins
+    header("Access-Control-Allow-Origin: *"); // Allow all origins
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS"); // Allow specific methods
     header("Access-Control-Allow-Headers: Content-Type, Authorization, User-Agent"); // Allow specific headers
 	
 	// example use from browser
-	// http://localhost/companydirectory/libs/php/getAllDepartments.php
+	// http://localhost/companydirectory/libs/php/insertDepartment.php?name=New%20Department&locationID=<id>
 
-	// remove next two lines for production	
+	// remove next two lines for production
 	
 	ini_set('display_errors', 'On');
 	error_reporting(E_ALL);
 
 	$executionStartTime = microtime(true);
-
+	
+	// this includes the login details
+	
 	include("config.php");
 
 	header('Content-Type: application/json; charset=UTF-8');
 
-	$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
+    $conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 
 	if (mysqli_connect_errno()) {
 		
@@ -35,13 +37,16 @@
 
 	}	
 
-	// SQL does not accept parameters and so is not prepared
+	// SQL statement accepts parameters and so is prepared to avoid SQL injection.
+	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
 
-	$query = 'SELECT id, name AS location FROM location ORDER BY name ASC';
+	$query = $conn->prepare('INSERT INTO location (name) VALUES(?)');
 
-	$result = $conn->query($query);
+	$query->bind_param("s", $_REQUEST['name']);
+
+	$query->execute();
 	
-	if (!$result) {
+	if (false === $query) {
 
 		$output['status']['code'] = "400";
 		$output['status']['name'] = "executed";
@@ -55,20 +60,12 @@
 		exit;
 
 	}
-   
-  $data = [];
-
-	while ($row = mysqli_fetch_assoc($result)) {
-
-		array_push($data, $row);
-
-	}
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
 	$output['status']['description'] = "success";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-	$output['data'] = $data;
+	$output['data'] = [];
 	
 	mysqli_close($conn);
 

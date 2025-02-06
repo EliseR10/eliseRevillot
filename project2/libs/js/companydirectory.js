@@ -104,6 +104,7 @@ $("#refreshBtn").click(function () {
   });*/
 
   function refreshPersonnelTable() {
+    // Call function to refresh personnel table
     $.ajax({
       url: "http://localhost:8080/itcareerswitch/project2/libs/php/getAll.php",
       type: 'GET',
@@ -206,7 +207,7 @@ $("#refreshBtn").click(function () {
   };
   
   function refreshLocationsTable() {
-    /*DISPLAY LOCATION DATA*/
+    // Call function to refresh locations table
     $.ajax({
       url: "http://localhost:8080/itcareerswitch/project2/libs/php/getAllLocations.php",
       type: 'GET',
@@ -253,8 +254,6 @@ $("#refreshBtn").click(function () {
       }
     })
   }
-  
-  
   
   /*MODIFY EMPLOYEE BUTTON*/
   $("#editPersonnelModal").on("show.bs.modal", function (e) {
@@ -487,7 +486,7 @@ $("#refreshBtn").click(function () {
     })
   })
 
-  /*Add Department when clicking on button save */
+  /*ADD DEPARTMENTS*/
   $('#addDepartmentForm').on('submit', function(event) {
     event.preventDefault(); // Prevent the form submission (page reload)
 
@@ -516,6 +515,43 @@ $("#refreshBtn").click(function () {
 
           //Close Modal
           $('#addDepartmentModal').modal("hide");
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Error loading data: ', error);
+        console.log("Response:", xhr.responseText);
+      }
+    })
+    } else {
+      alert('Please fill in both the department name and select a location.');
+    }
+  })
+
+  /*ADD LOCATIONS*/
+  $('#addLocationForm').on('submit', function(event) {
+    event.preventDefault(); // Prevent the form submission (page reload)
+
+    const newLocation = $('#addLocationName').val();
+
+    console.log('Location: ', newLocation);
+
+    if (newLocation) {
+    $.ajax({
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/insertLocations.php',
+      type: 'POST',
+      dataType: 'json',
+      data : {
+        name: newLocation,
+      },
+      success: function(result) {
+        if (result.status.code === '200') {
+          //Reset the form inputs
+          $('#addLocationName').val('');
+
+          //Close Modal
+          $('#addLocationModal').modal("hide");
+
+          alert('Location added successfully.');
         }
       },
       error: function(xhr, status, error) {
