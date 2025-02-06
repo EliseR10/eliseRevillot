@@ -458,8 +458,92 @@ $("#refreshBtn").click(function () {
     }
   })
 
+  /*ADD PERSONNEL*/
+  /*Populate department selection in addPersonnelModal*/
+  $('#addPersonnelModal').on('show.bs.modal', function() {
+    const $select = $('#addPersonnelDepartment');
+    $select.empty(); // Clear previous options to not show the dep in duplicate
+    
+    $.ajax({
+      url: "http://localhost:8080/itcareerswitch/project2/libs/php/getAllDepartments.php",
+      type: 'GET',
+      dataType: 'json',
+      success: function (result) {
+
+        if (result.status.code === '200')  {
+          $.each(result.data, function(index, department) {
+            $select.append(
+              $('<option>', {
+                value: department.id,
+                text: department.name
+              })
+            );
+          })
+        } else {
+          alert('Error loading departments');
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Error loading data: ', error);
+        console.log("Response:", xhr.responseText);
+      }
+    })
+  })
+
+  $('#addPersonnelForm').on('submit', function(event) {
+    event.preventDefault(); // Prevent the form submission (page reload)
+
+    const newFirstName = $('#addPersonnelFirstName').val();
+    const newLastName = $('#addPersonnelLastName').val();
+    const newJobTitle = $('#addPersonnelJobTitle').val();
+    const newEmail = $('#addPersonnelEmailAddress').val();
+    const newDepartment = $('#addPersonnelDepartment').val();
+
+    console.log('Department new employee: ', newFirstName, newLastName, newJobTitle, newEmail, newDepartment);
+
+    if (newFirstName, newLastName, newJobTitle, newEmail, newDepartment) {
+    $.ajax({
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/insertPersonnel.php',
+      type: 'POST',
+      dataType: 'json',
+      data : {
+        firstName: newFirstName,
+        lastName: newLastName,
+        jobTitle: newJobTitle,
+        email: newEmail,
+        departmentID: newDepartment
+      },
+      success: function(result) {
+        if (result.status.code === '200') {
+          alert('Employee added successfully.');
+
+          //Reset the form inputs
+          $('#addPersonnelFirstName').val('');
+          $('#addPersonnelLastName').val('');
+          $('#addPersonnelJobTitle').val('');
+          $('#addPersonnelEmailAddress').val('');
+          $('#addPersonnelDepartment').val('');
+
+          //Close Modal
+          $('#addPersonnelModal').modal("hide");
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Error loading data: ', error);
+        console.log("Response:", xhr.responseText);
+      }
+    })
+    } else {
+      alert('Please fill in all the informations needed.');
+    }
+  })
+
+  /*ADD DEPARTMENTS*/
   /*Populate location selection in addDepartmentModal*/
   $('#addDepartmentModal').on('show.bs.modal', function() {
+    const $select = $('#addDepartmentLocation');
+    $select.empty(); // Clear previous options to not show the loc in duplicate
+
     $.ajax({
       url: "http://localhost:8080/itcareerswitch/project2/libs/php/getAllLocations.php",
       type: 'GET',
@@ -468,7 +552,7 @@ $("#refreshBtn").click(function () {
 
         if (result.status.code === '200')  {
           $.each(result.data, function(index, location) {
-            $('#addDepartmentLocation').append(
+            $select.append(
               $('<option>', {
                 value: location.id,
                 text: location.location
@@ -486,7 +570,6 @@ $("#refreshBtn").click(function () {
     })
   })
 
-  /*ADD DEPARTMENTS*/
   $('#addDepartmentForm').on('submit', function(event) {
     event.preventDefault(); // Prevent the form submission (page reload)
 
@@ -560,7 +643,7 @@ $("#refreshBtn").click(function () {
       }
     })
     } else {
-      alert('Please fill in both the department name and select a location.');
+      alert('Please fill in the location.');
     }
   })
 
