@@ -671,6 +671,92 @@ $("#refreshBtn").click(function () {
     })
   });
 
+  /*MODIFY DEPARTMENT*/
+  $("#editDepartmentModal").on("show.bs.modal", function (e) {
+
+    $.ajax({
+      url:"http://localhost:8080/itcareerswitch/project2/libs/php/getDepartmentByID.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        // Retrieve the data-id attribute from the calling button
+        // see https://getbootstrap.com/docs/5.0/components/modal/#varying-modal-content
+        // for the non-jQuery JavaScript alternative
+        id: $(e.relatedTarget).attr("data-id") 
+      },
+      success: function (result) {
+        var resultCode = result.status.code;
+
+        if (resultCode == 200) {
+          
+          // Update the hidden input with the employee id so that
+          // it can be referenced when the form is submitted
+  
+          $("#editDepartmentID").val(result.data.department[0].department_id);
+          $("#editDepartmentName").val(result.data.department[0].department_name);
+  
+          $("#editDepartmentLocation").html("");
+  
+          $.each(result.data.location, function () {
+            $("#editDepartmentLocation").append(
+              $("<option>", {
+                value: this.id,
+                text: this.name
+              })
+            );
+          });
+  
+          $("#editDepartmentLocation").val(result.data.department[0].location_id);
+          
+        } else {
+          $("#editDepartmentModal .modal-title").replaceWith(
+            "Error retrieving data"
+          );
+        }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $("#editDepartmentModal .modal-title").replaceWith(
+          "Error retrieving data"
+        );
+      }
+    });
+  });
+  
+  // Executes when the form button with type="submit" is clicked
+  $("#editDepartmentForm").on("submit", function (event) {
+    event.preventDefault(); // Prevent the form submission (page reload)
+
+    const id = $('#editDepartmentID').val();
+    const departmentName = $('#editDepartmentName').val();
+    const locationID = $('#editDepartmentLocation').val();
+
+    $.ajax({
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/updateDepartment.php',
+      type: 'POST',
+      dataType: 'json',
+      data : {
+        id: id,
+        name: departmentName,
+        locationID: locationID
+      },
+      success: function(result) {
+        if (result.status.code === '200') {
+          alert('Department updated successfully.');
+
+          //Close Modal
+          $('#editDepartmentModal').modal("hide");
+        } else {
+          alert('Error udpating department.');
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Error loading data: ', error);
+        console.log("Response:", xhr.responseText);
+      }
+    })
+  });
+
+
   /*MODIFY LOCATION*/
   $("#editLocationModal").on("show.bs.modal", function (e) {
 
@@ -686,7 +772,6 @@ $("#refreshBtn").click(function () {
       },
       success: function (result) {
         var resultCode = result.status.code;
-        console.log(result);
 
         if (resultCode == 200) {
           

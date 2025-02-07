@@ -1,12 +1,11 @@
 <?php
-	header("Access-Control-Allow-Origin: *"); // Allow all origins
+    header("Access-Control-Allow-Origin: *"); // Allow all origins
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS"); // Allow specific methods
     header("Access-Control-Allow-Headers: Content-Type, Authorization, User-Agent"); // Allow specific headers
-	
 	// example use from browser
-	// http://localhost/companydirectory/libs/php/getAllDepartments.php
+	// http://localhost/companydirectory/libs/php/getAll.php
 
-	// remove next two lines for production	
+	// remove next two lines for production
 	
 	ini_set('display_errors', 'On');
 	error_reporting(E_ALL);
@@ -19,7 +18,7 @@
 
 	$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 
-	if (mysqli_connect_errno()) {
+    if (mysqli_connect_errno()) {
 		
 		$output['status']['code'] = "300";
 		$output['status']['name'] = "failure";
@@ -36,12 +35,14 @@
 	}	
 
 	// SQL does not accept parameters and so is not prepared
+    // $_REQUEST used for development / debugging. Remember to change to $_POST for production
+	$query = $conn->prepare('UPDATE department SET name = ?, locationID = ? WHERE id = ?');
 
-	$query = 'SELECT d.id, d.name AS department, l.name AS location FROM department d LEFT JOIN location l ON d.locationID = l.id ORDER BY d.name ASC';
+	$query->bind_param("sii", $_REQUEST['name'], $_REQUEST['locationID'], $_REQUEST['id']);
 
-	$result = $conn->query($query);
+	$query->execute();
 	
-	if (!$result) {
+	if (false === $query) {
 
 		$output['status']['code'] = "400";
 		$output['status']['name'] = "executed";
@@ -55,20 +56,12 @@
 		exit;
 
 	}
-   
-  $data = [];
-
-	while ($row = mysqli_fetch_assoc($result)) {
-
-		array_push($data, $row);
-
-	}
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
 	$output['status']['description'] = "success";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-	$output['data'] = $data;
+	$output['data'] = [];
 	
 	mysqli_close($conn);
 
