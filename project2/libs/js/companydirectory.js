@@ -841,22 +841,21 @@ $("#refreshBtn").click(function () {
       },
       success: function (result) {
         var resultCode = result.status.code;
-        console.log(result);
 
         if (resultCode == 200) {
           
           // Update the hidden input with the employee id so that
           // it can be referenced when the form is submitted
           $("#deleteDepartmentID").val(result.data.department[0].department_id);
-          $("#departmentName").html('<strong>' + result.data.department[0].department_name + '</strong');
-          
+
           if(result.data.department.employee_count > 0) {
-            $('#deleteDepartmentForm').html("<p>The <strong>" + result.data.department[0].department_name + "</strong> department has <strong>" + result.data.department.employee_count + " employee(s)</strong> attached.</p><p>You cannot delete this department at the moment.</p>");
+            $('#deleteDepartmentForm').html("<p>You cannot delete <strong>" + result.data.department[0].department_name + "</strong> from the departments at this moment.</p><p>This department has <strong>" + result.data.department.employee_count + " employee(s)</strong> assigned to it.</p>");
             $('.btn-submit-delete').prop("disabled", true); //disable the delete button
           } else {
             $('#deleteDepartmentForm').html("<p>Are you sure you want to delete the following department? </p>" + "<p><strong>" + result.data.department[0].department_name + "</strong></p>");
             $(".btn-submit-delete").prop("disabled", false);
           }
+
         } else {
           $("#deleteDepartmentModal .modal-title").replaceWith(
             "Error retrieving data"
@@ -915,14 +914,20 @@ $("#refreshBtn").click(function () {
       },
       success: function (result) {
         var resultCode = result.status.code;
-        console.log(result);
 
         if (resultCode == 200) {
           
           // Update the hidden input with the employee id so that
           // it can be referenced when the form is submitted
           $("#deleteLocationID").val(result.data[0].id);
-          $("#locationName").html('<strong>' + result.data[0].name + '</strong');
+
+          if(result.data.department_count > 0) {
+            $('#deleteLocationForm').html("<p>You cannot delete <strong>" + result.data[0].name + "</strong> from the location at this moment.</p><p>This location has <strong>" + result.data.department_count + " department(s)</strong> assigned to it.</p>");
+            $('.btn-submit-delete').prop("disabled", true); //disable the delete button
+          } else {
+            $('#deleteLocationForm').html("<p>Are you sure you want to delete the following location? </p>" + "<p><strong>" + result.data[0].name + "</strong></p>");
+            $(".btn-submit-delete").prop("disabled", false);
+          }
           
         } else {
           $("#deleteLocationModal .modal-title").replaceWith(
