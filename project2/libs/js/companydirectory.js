@@ -893,4 +893,71 @@ $("#refreshBtn").click(function () {
     })
   });
 
+  /*DELETE LOCATIONS*/
+  $("#deleteLocationModal").on("show.bs.modal", function (e) {
+    $.ajax({
+      url:"http://localhost:8080/itcareerswitch/project2/libs/php/GET/getLocationByID.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        // Retrieve the data-id attribute from the calling button
+        // see https://getbootstrap.com/docs/5.0/components/modal/#varying-modal-content
+        // for the non-jQuery JavaScript alternative
+        id: $(e.relatedTarget).attr("data-id") 
+      },
+      success: function (result) {
+        var resultCode = result.status.code;
+        console.log(result);
+
+        if (resultCode == 200) {
+          
+          // Update the hidden input with the employee id so that
+          // it can be referenced when the form is submitted
+          $("#deleteLocationID").val(result.data[0].id);
+          $("#locationName").html('<strong>' + result.data[0].name + '</strong');
+          
+        } else {
+          $("#deleteLocationModal .modal-title").replaceWith(
+            "Error retrieving data"
+          );
+        }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $("#deleteLocationModal .modal-title").replaceWith(
+          "Error retrieving data"
+        );
+      }
+    });
+  })
+
+  // Executes when the form button with type="submit" is clicked
+  $("#deleteLocationForm").on("submit", function (event) {
+    event.preventDefault(); // Prevent the form submission (page reload)
+
+    const id = $('#deleteLocationID').val();
+
+    $.ajax({
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/DELETE/deleteLocationByID.php',
+      type: 'POST',
+      dataType: 'json',
+      data : {
+        id: id,
+      },
+      success: function(result) {
+        if (result.status.code === '200') {
+          alert('Location deleted successfully.');
+
+          //Close Modal
+          $('#deleteLocationModal').modal("hide");
+        } else {
+          alert('Error deleting location.');
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Error loading data: ', error);
+        console.log("Response:", xhr.responseText);
+      }
+    })
+  });
+
 }); //document.ready
