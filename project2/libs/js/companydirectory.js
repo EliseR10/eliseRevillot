@@ -827,6 +827,73 @@ $("#refreshBtn").click(function () {
     })
   });
 
+  /*DELETE PERSONNEL*/
+  $("#deletePersonnelModal").on("show.bs.modal", function (e) {
+    $.ajax({
+      url:"http://localhost:8080/itcareerswitch/project2/libs/php/GET/getPersonnelByID.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        // Retrieve the data-id attribute from the calling button
+        // see https://getbootstrap.com/docs/5.0/components/modal/#varying-modal-content
+        // for the non-jQuery JavaScript alternative
+        id: $(e.relatedTarget).attr("data-id") 
+      },
+      success: function (result) {
+        var resultCode = result.status.code;
+        console.log(result);
+
+        if (resultCode == 200) {
+          
+          // Update the hidden input with the employee id so that
+          // it can be referenced when the form is submitted
+          $("#deletePersonnelID").val(result.data.personnel[0].id);
+          $("#deleteName").html("<p><strong>" + result.data.personnel[0].lastName + ", " + result.data.personnel[0].firstName + "</strong></p>");
+
+        } else {
+          $("#deletePersonnelModal .modal-title").replaceWith(
+            "Error retrieving data"
+          );
+        }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $("#deletePersonnelModal .modal-title").replaceWith(
+          "Error retrieving data"
+        );
+      }
+    });
+  })
+
+  // Executes when the form button with type="submit" is clicked
+  $("#deletePersonnelForm").on("submit", function (event) {
+    event.preventDefault(); // Prevent the form submission (page reload)
+
+    const id = $('#deletePersonnelID').val();
+
+    $.ajax({
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/DELETE/deletePersonnelByID.php',
+      type: 'POST',
+      dataType: 'json',
+      data : {
+        id: id,
+      },
+      success: function(result) {
+        if (result.status.code === '200') {
+          alert('Personnel deleted successfully.');
+
+          //Close Modal
+          $('#deletePersonnelModal').modal("hide");
+        } else {
+          alert('Error deleting personnel.');
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Error loading data: ', error);
+        console.log("Response:", xhr.responseText);
+      }
+    })
+  });
+
   /*DELETE DEPARTMENTS*/
   $("#deleteDepartmentModal").on("show.bs.modal", function (e) {
     $.ajax({
