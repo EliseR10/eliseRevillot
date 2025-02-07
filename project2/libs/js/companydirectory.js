@@ -671,6 +671,76 @@ $("#refreshBtn").click(function () {
     })
   });
 
+  /*MODIFY LOCATION*/
+  $("#editLocationModal").on("show.bs.modal", function (e) {
+
+    $.ajax({
+      url:"http://localhost:8080/itcareerswitch/project2/libs/php/getLocationByID.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        // Retrieve the data-id attribute from the calling button
+        // see https://getbootstrap.com/docs/5.0/components/modal/#varying-modal-content
+        // for the non-jQuery JavaScript alternative
+        id: $(e.relatedTarget).attr("data-id") 
+      },
+      success: function (result) {
+        var resultCode = result.status.code;
+        console.log(result);
+
+        if (resultCode == 200) {
+          
+          // Update the hidden input with the employee id so that
+          // it can be referenced when the form is submitted
+  
+          $("#editLocationID").val(result.data[0].id);
+          $("#editLocationName").val(result.data[0].name);
+          
+        } else {
+          $("#editLocationModal .modal-title").replaceWith(
+            "Error retrieving data"
+          );
+        }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $("#editLocationModal .modal-title").replaceWith(
+          "Error retrieving data"
+        );
+      }
+    });
+  });
+  
+  // Executes when the form button with type="submit" is clicked
+  $("#editLocationForm").on("submit", function (event) {
+    event.preventDefault(); // Prevent the form submission (page reload)
+
+    const id = $('#editLocationID').val();
+    const editLocation = $('#editLocationName').val();
+
+    $.ajax({
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/updateLocations.php',
+      type: 'POST',
+      dataType: 'json',
+      data : {
+        id: id,
+        name: editLocation
+      },
+      success: function(result) {
+        if (result.status.code === '200') {
+          alert('Location updated successfully.');
+
+          //Close Modal
+          $('#editLocationModal').modal("hide");
+        } else {
+          alert('Error udpating location.');
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Error loading data: ', error);
+        console.log("Response:", xhr.responseText);
+      }
+    })
+  });
 
 
 }); //document.ready

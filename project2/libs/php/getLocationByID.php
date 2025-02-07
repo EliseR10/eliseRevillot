@@ -1,5 +1,5 @@
 <?php
-	header("Access-Control-Allow-Origin: *"); // Allow all origins
+    header("Access-Control-Allow-Origin: *"); // Allow all origins
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS"); // Allow specific methods
     header("Access-Control-Allow-Headers: Content-Type, Authorization, User-Agent"); // Allow specific headers
 	// example use from browser
@@ -37,7 +37,7 @@
 	// SQL statement accepts parameters and so is prepared to avoid SQL injection.
 	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
 
-	$query = $conn->prepare('SELECT id, name, locationID FROM department WHERE id =  ?');
+	$query = $conn->prepare('SELECT id, name FROM location WHERE id =  ?');
 
 	$query->bind_param("i", $_REQUEST['id']);
 
