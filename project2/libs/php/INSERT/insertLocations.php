@@ -1,5 +1,5 @@
 <?php
-	header("Access-Control-Allow-Origin: *"); // Allow all origins
+    header("Access-Control-Allow-Origin: *"); // Allow all origins
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS"); // Allow specific methods
     header("Access-Control-Allow-Headers: Content-Type, Authorization, User-Agent"); // Allow specific headers
 	
@@ -15,12 +15,11 @@
 	
 	// this includes the login details
 	
-	include("config.php");
+	include("../config.php");
 
 	header('Content-Type: application/json; charset=UTF-8');
 
-    //Creates a new connection to MySQL database using MySQLi extension
-	$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
+    $conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 
 	if (mysqli_connect_errno()) {
 		
@@ -41,9 +40,9 @@
 	// SQL statement accepts parameters and so is prepared to avoid SQL injection.
 	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
 
-	$query = $conn->prepare('INSERT INTO personnel (firstName, lastName, jobTitle, email, departmentID) VALUES(?,?,?,?,?)');
+	$query = $conn->prepare('INSERT INTO location (name) VALUES(?)');
 
-	$query->bind_param("ssssi", $_REQUEST['firstName'], $_REQUEST['lastName'], $_REQUEST['jobTitle'], $_REQUEST['email'], $_REQUEST['departmentID']);
+	$query->bind_param("s", $_REQUEST['name']);
 
 	$query->execute();
 	

@@ -1,21 +1,25 @@
 <?php
-    header("Access-Control-Allow-Origin: *"); // Allow all origins
+	header("Access-Control-Allow-Origin: *"); // Allow all origins
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS"); // Allow specific methods
     header("Access-Control-Allow-Headers: Content-Type, Authorization, User-Agent"); // Allow specific headers
+	
 	// example use from browser
-	// http://localhost/companydirectory/libs/php/getDepartmentByID.php?id=<id>
+	// http://localhost/companydirectory/libs/php/insertDepartment.php?name=New%20Department&locationID=<id>
 
-	// remove next two lines for production	
-
+	// remove next two lines for production
+	
 	ini_set('display_errors', 'On');
 	error_reporting(E_ALL);
 
 	$executionStartTime = microtime(true);
-
-	include("config.php");
+	
+	// this includes the login details
+	
+	include("../config.php");
 
 	header('Content-Type: application/json; charset=UTF-8');
 
+    //Creates a new connection to MySQL database using MySQLi extension
 	$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 
 	if (mysqli_connect_errno()) {
@@ -25,11 +29,11 @@
 		$output['status']['description'] = "database unavailable";
 		$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 		$output['data'] = [];
-		
+
 		mysqli_close($conn);
 
 		echo json_encode($output);
-		
+
 		exit;
 
 	}	
@@ -37,9 +41,9 @@
 	// SQL statement accepts parameters and so is prepared to avoid SQL injection.
 	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
 
-	$query = $conn->prepare('SELECT id, name FROM location WHERE id =  ?');
+	$query = $conn->prepare('INSERT INTO personnel (firstName, lastName, jobTitle, email, departmentID) VALUES(?,?,?,?,?)');
 
-	$query->bind_param("i", $_REQUEST['id']);
+	$query->bind_param("ssssi", $_REQUEST['firstName'], $_REQUEST['lastName'], $_REQUEST['jobTitle'], $_REQUEST['email'], $_REQUEST['departmentID']);
 
 	$query->execute();
 	
@@ -50,20 +54,11 @@
 		$output['status']['description'] = "query failed";	
 		$output['data'] = [];
 
-		echo json_encode($output); 
-	
 		mysqli_close($conn);
+
+		echo json_encode($output); 
+
 		exit;
-
-	}
-
-	$result = $query->get_result();
-
-   	$data = [];
-
-	while ($row = mysqli_fetch_assoc($result)) {
-
-		array_push($data, $row);
 
 	}
 
@@ -71,10 +66,10 @@
 	$output['status']['name'] = "ok";
 	$output['status']['description'] = "success";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-	$output['data'] = $data;
+	$output['data'] = [];
+	
+	mysqli_close($conn);
 
 	echo json_encode($output); 
-
-	mysqli_close($conn);
 
 ?>

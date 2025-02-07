@@ -106,7 +106,7 @@ $("#refreshBtn").click(function () {
   function refreshPersonnelTable() {
     // Call function to refresh personnel table
     $.ajax({
-      url: "http://localhost:8080/itcareerswitch/project2/libs/php/getAll.php",
+      url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAll.php",
       type: 'GET',
       dataType: 'json',
       success: function (result) {
@@ -158,7 +158,7 @@ $("#refreshBtn").click(function () {
   function refreshDepartmentsTable() {
     // Call function to refresh department table
     $.ajax({
-      url: "http://localhost:8080/itcareerswitch/project2/libs/php/getAllDepartmentsDisplay.php",
+      url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAllDepartmentsDisplay.php",
       type: 'GET',
       dataType: 'json',
       success: function (result) {
@@ -209,7 +209,7 @@ $("#refreshBtn").click(function () {
   function refreshLocationsTable() {
     // Call function to refresh locations table
     $.ajax({
-      url: "http://localhost:8080/itcareerswitch/project2/libs/php/getAllLocations.php",
+      url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAllLocations.php",
       type: 'GET',
       dataType: 'json',
       success: function (result) {
@@ -257,7 +257,7 @@ $("#refreshBtn").click(function () {
 
 /*DISPLAY EMPLOYEE DATA*/
   $.ajax({
-    url: "http://localhost:8080/itcareerswitch/project2/libs/php/getAll.php",
+    url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAll.php",
     type: 'GET',
     dataType: 'json',
     success: function (result) {
@@ -304,7 +304,7 @@ $("#refreshBtn").click(function () {
 
 /*DISPLAY DEPARTMENT DATA*/
   $.ajax({
-    url: "http://localhost:8080/itcareerswitch/project2/libs/php/getAllDepartmentsDisplay.php",
+    url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAllDepartmentsDisplay.php",
     type: 'GET',
     dataType: 'json',
     success: function (result) {
@@ -348,7 +348,7 @@ $("#refreshBtn").click(function () {
 
   /*DISPLAY LOCATION DATA*/
   $.ajax({
-    url: "http://localhost:8080/itcareerswitch/project2/libs/php/getAllLocations.php",
+    url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAllLocations.php",
     type: 'GET',
     dataType: 'json',
     success: function (result) {
@@ -396,7 +396,7 @@ $("#refreshBtn").click(function () {
     $select.empty(); // Clear previous options to not show the dep in duplicate
     
     $.ajax({
-      url: "http://localhost:8080/itcareerswitch/project2/libs/php/getAllDepartments.php",
+      url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAllDepartments.php",
       type: 'GET',
       dataType: 'json',
       success: function (result) {
@@ -432,7 +432,7 @@ $("#refreshBtn").click(function () {
 
     if (newFirstName, newLastName, newJobTitle, newEmail, newDepartment) {
     $.ajax({
-      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/insertPersonnel.php',
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/INSERT/insertPersonnel.php',
       type: 'POST',
       dataType: 'json',
       data : {
@@ -474,7 +474,7 @@ $("#refreshBtn").click(function () {
     $select.empty(); // Clear previous options to not show the loc in duplicate
 
     $.ajax({
-      url: "http://localhost:8080/itcareerswitch/project2/libs/php/getAllLocations.php",
+      url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAllLocations.php",
       type: 'GET',
       dataType: 'json',
       success: function (result) {
@@ -510,7 +510,7 @@ $("#refreshBtn").click(function () {
 
     if (newDepartment && departmentLocation) {
     $.ajax({
-      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/insertDepartment.php',
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/INSERT/insertDepartment.php',
       type: 'POST',
       dataType: 'json',
       data : {
@@ -549,7 +549,7 @@ $("#refreshBtn").click(function () {
 
     if (newLocation) {
     $.ajax({
-      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/insertLocations.php',
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/INSERT/insertLocations.php',
       type: 'POST',
       dataType: 'json',
       data : {
@@ -580,7 +580,7 @@ $("#refreshBtn").click(function () {
   $("#editPersonnelModal").on("show.bs.modal", function (e) {
 
     $.ajax({
-      url:"http://localhost:8080/itcareerswitch/project2/libs/php/getPersonnelByID.php",
+      url:"http://localhost:8080/itcareerswitch/project2/libs/php/GET/getPersonnelByID.php",
       type: "POST",
       dataType: "json",
       data: {
@@ -643,7 +643,7 @@ $("#refreshBtn").click(function () {
     const department = $('#editPersonnelDepartment').val();
 
     $.ajax({
-      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/updatePersonnel.php',
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/UPDATE/updatePersonnel.php',
       type: 'POST',
       dataType: 'json',
       data : {
@@ -675,7 +675,7 @@ $("#refreshBtn").click(function () {
   $("#editDepartmentModal").on("show.bs.modal", function (e) {
 
     $.ajax({
-      url:"http://localhost:8080/itcareerswitch/project2/libs/php/getDepartmentByID.php",
+      url:"http://localhost:8080/itcareerswitch/project2/libs/php/GET/getDepartmentByID.php",
       type: "POST",
       dataType: "json",
       data: {
@@ -731,7 +731,7 @@ $("#refreshBtn").click(function () {
     const locationID = $('#editDepartmentLocation').val();
 
     $.ajax({
-      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/updateDepartment.php',
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/UPDATE/updateDepartment.php',
       type: 'POST',
       dataType: 'json',
       data : {
@@ -761,7 +761,7 @@ $("#refreshBtn").click(function () {
   $("#editLocationModal").on("show.bs.modal", function (e) {
 
     $.ajax({
-      url:"http://localhost:8080/itcareerswitch/project2/libs/php/getLocationByID.php",
+      url:"http://localhost:8080/itcareerswitch/project2/libs/php/GET/getLocationByID.php",
       type: "POST",
       dataType: "json",
       data: {
@@ -803,7 +803,7 @@ $("#refreshBtn").click(function () {
     const editLocation = $('#editLocationName').val();
 
     $.ajax({
-      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/updateLocations.php',
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/UPDATE/updateLocations.php',
       type: 'POST',
       dataType: 'json',
       data : {

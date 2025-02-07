@@ -1,9 +1,8 @@
 <?php
-    header("Access-Control-Allow-Origin: *"); // Allow all origins
-    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS"); // Allow specific methods
-    header("Access-Control-Allow-Headers: Content-Type, Authorization, User-Agent"); // Allow specific headers
+
 	// example use from browser
-	// http://localhost/companydirectory/libs/php/getAll.php
+	// use insertDepartment.php first to create new dummy record and then specify it's id in the command below
+	// http://localhost/companydirectory/libs/php/deleteDepartmentByID.php?id=<id>
 
 	// remove next two lines for production
 	
@@ -12,13 +11,13 @@
 
 	$executionStartTime = microtime(true);
 
-	include("config.php");
+	include("../config.php");
 
 	header('Content-Type: application/json; charset=UTF-8');
 
 	$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 
-    if (mysqli_connect_errno()) {
+	if (mysqli_connect_errno()) {
 		
 		$output['status']['code'] = "300";
 		$output['status']['name'] = "failure";
@@ -34,11 +33,12 @@
 
 	}	
 
-	// SQL does not accept parameters and so is not prepared
-    // $_REQUEST used for development / debugging. Remember to change to $_POST for production
-	$query = $conn->prepare('UPDATE personnel SET firstName = ?, lastName = ?, jobTitle = ?, email = ?, departmentID = ? WHERE id = ?');
+	// SQL statement accepts parameters and so is prepared to avoid SQL injection.
+	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
 
-	$query->bind_param("ssssii", $_REQUEST['firstName'], $_REQUEST['lastName'], $_REQUEST['jobTitle'], $_REQUEST['email'], $_REQUEST['departmentID'], $_REQUEST['id']);
+	$query = $conn->prepare('DELETE FROM department WHERE id = ?');
+	
+	$query->bind_param("i", $_REQUEST['id']);
 
 	$query->execute();
 	
