@@ -254,75 +254,6 @@ $("#refreshBtn").click(function () {
       }
     })
   }
-  
-  /*MODIFY EMPLOYEE BUTTON*/
-  $("#editPersonnelModal").on("show.bs.modal", function (e) {
-    
-    $.ajax({
-      url:
-        "./php/companydirectory/libs/php/getPersonnelByID.php",
-      type: "POST",
-      dataType: "json",
-      data: {
-        // Retrieve the data-id attribute from the calling button
-        // see https://getbootstrap.com/docs/5.0/components/modal/#varying-modal-content
-        // for the non-jQuery JavaScript alternative
-        id: $(e.relatedTarget).attr("data-id") 
-      },
-      success: function (result) {
-        var resultCode = result.status.code;
-  
-        if (resultCode == 200) {
-          
-          // Update the hidden input with the employee id so that
-          // it can be referenced when the form is submitted
-  
-          $("#editPersonnelEmployeeID").val(result.data.personnel[0].id);
-  
-          $("#editPersonnelFirstName").val(result.data.personnel[0].firstName);
-          $("#editPersonnelLastName").val(result.data.personnel[0].lastName);
-          $("#editPersonnelJobTitle").val(result.data.personnel[0].jobTitle);
-          $("#editPersonnelEmailAddress").val(result.data.personnel[0].email);
-  
-          $("#editPersonnelDepartment").html("");
-  
-          $.each(result.data.department, function () {
-            $("#editPersonnelDepartment").append(
-              $("<option>", {
-                value: this.id,
-                text: this.name
-              })
-            );
-          });
-  
-          $("#editPersonnelDepartment").val(result.data.personnel[0].departmentID);
-          
-        } else {
-          $("#editPersonnelModal .modal-title").replaceWith(
-            "Error retrieving data"
-          );
-        }
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        $("#editPersonnelModal .modal-title").replaceWith(
-          "Error retrieving data"
-        );
-      }
-    });
-  });
-  
-  // Executes when the form button with type="submit" is clicked
-  
-  $("#editPersonnelForm").on("submit", function (e) {
-    
-    // Executes when the form button with type="submit" is clicked
-    // stop the default browser behviour
-  
-    e.preventDefault();
-  
-    // AJAX call to save form data
-    
-  });
 
 /*DISPLAY EMPLOYEE DATA*/
   $.ajax({
@@ -499,8 +430,6 @@ $("#refreshBtn").click(function () {
     const newEmail = $('#addPersonnelEmailAddress').val();
     const newDepartment = $('#addPersonnelDepartment').val();
 
-    console.log('Department new employee: ', newFirstName, newLastName, newJobTitle, newEmail, newDepartment);
-
     if (newFirstName, newLastName, newJobTitle, newEmail, newDepartment) {
     $.ajax({
       url: 'http://localhost:8080/itcareerswitch/project2/libs/php/insertPersonnel.php',
@@ -646,5 +575,102 @@ $("#refreshBtn").click(function () {
       alert('Please fill in the location.');
     }
   })
+
+  /*MODIFY EMPLOYEE*/
+  $("#editPersonnelModal").on("show.bs.modal", function (e) {
+
+    $.ajax({
+      url:"http://localhost:8080/itcareerswitch/project2/libs/php/getPersonnelByID.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        // Retrieve the data-id attribute from the calling button
+        // see https://getbootstrap.com/docs/5.0/components/modal/#varying-modal-content
+        // for the non-jQuery JavaScript alternative
+        id: $(e.relatedTarget).attr("data-id") 
+      },
+      success: function (result) {
+        var resultCode = result.status.code;
+
+        if (resultCode == 200) {
+          
+          // Update the hidden input with the employee id so that
+          // it can be referenced when the form is submitted
+  
+          $("#editPersonnelEmployeeID").val(result.data.personnel[0].id);
+  
+          $("#editPersonnelFirstName").val(result.data.personnel[0].firstName);
+          $("#editPersonnelLastName").val(result.data.personnel[0].lastName);
+          $("#editPersonnelJobTitle").val(result.data.personnel[0].jobTitle);
+          $("#editPersonnelEmailAddress").val(result.data.personnel[0].email);
+  
+          $("#editPersonnelDepartment").html("");
+  
+          $.each(result.data.department, function () {
+            $("#editPersonnelDepartment").append(
+              $("<option>", {
+                value: this.id,
+                text: this.name
+              })
+            );
+          });
+  
+          $("#editPersonnelDepartment").val(result.data.personnel[0].departmentID);
+          
+        } else {
+          $("#editPersonnelModal .modal-title").replaceWith(
+            "Error retrieving data"
+          );
+        }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $("#editPersonnelModal .modal-title").replaceWith(
+          "Error retrieving data"
+        );
+      }
+    });
+  });
+  
+  // Executes when the form button with type="submit" is clicked
+  $("#editPersonnelForm").on("submit", function (event) {
+    event.preventDefault(); // Prevent the form submission (page reload)
+
+    const id = $('#editPersonnelEmployeeID').val();
+    const firstName = $('#editPersonnelFirstName').val();
+    const lastName = $('#editPersonnelLastName').val();
+    const jobTitle = $('#editPersonnelJobTitle').val();
+    const email = $('#editPersonnelEmailAddress').val();
+    const department = $('#editPersonnelDepartment').val();
+
+    $.ajax({
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/updatePersonnel.php',
+      type: 'POST',
+      dataType: 'json',
+      data : {
+        id: id,
+        firstName: firstName,
+        lastName: lastName,
+        jobTitle: jobTitle,
+        email: email,
+        departmentID: department
+      },
+      success: function(result) {
+        if (result.status.code === '200') {
+          alert('Employee updated successfully.');
+
+          //Close Modal
+          $('#editPersonnelModal').modal("hide");
+        } else {
+          alert('Error udpating employee.');
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Error loading data: ', error);
+        console.log("Response:", xhr.responseText);
+      }
+    })
+  });
+
+
 
 }); //document.ready
