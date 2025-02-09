@@ -1,4 +1,7 @@
 <?php
+	header("Access-Control-Allow-Origin: *"); // Allow all origins
+    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS"); // Allow specific methods
+    header("Access-Control-Allow-Headers: Content-Type, Authorization, User-Agent"); // Allow specific headers
 
 	// example use from browser
 	// http://localhost/companydirectory/libs/php/searchAll.php?txt=<txt>
@@ -37,9 +40,9 @@
 
 	$query = $conn->prepare('SELECT `p`.`id`, `p`.`firstName`, `p`.`lastName`, `p`.`email`, `p`.`jobTitle`, `d`.`id` as `departmentID`, `d`.`name` AS `departmentName`, `l`.`id` as `locationID`, `l`.`name` AS `locationName` FROM `personnel` `p` LEFT JOIN `department` `d` ON (`d`.`id` = `p`.`departmentID`) LEFT JOIN `location` `l` ON (`l`.`id` = `d`.`locationID`) WHERE `p`.`firstName` LIKE ? OR `p`.`lastName` LIKE ? OR `p`.`email` LIKE ? OR `p`.`jobTitle` LIKE ? OR `d`.`name` LIKE ? OR `l`.`name` LIKE ? ORDER BY `p`.`lastName`, `p`.`firstName`, `d`.`name`, `l`.`name`');
 
-  $likeText = "%" . $_REQUEST['txt'] . "%";
+  	$likeText = "%" . $_REQUEST['txt'] . "%";
 
-  $query->bind_param("ssssss", $likeText, $likeText, $likeText, $likeText, $likeText, $likeText);
+  	$query->bind_param("ssssss", $likeText, $likeText, $likeText, $likeText, $likeText, $likeText);
 
 	$query->execute();
 	

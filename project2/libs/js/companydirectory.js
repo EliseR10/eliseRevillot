@@ -1,9 +1,128 @@
 $(document).ready(function() {
-$("#searchInp").on("keyup", function () {
-  
-    // your code
-    
-});
+  //Disable search bar if department or location tab open
+  $('.nav-link').on('click', function() {
+    let activeTab = $('.nav-link.active').attr('id'); //grab the id of the current active tab
+
+    if (activeTab === 'departmentsBtn' || activeTab === 'locationsBtn') {
+      $('#searchInp').prop('disabled', true);
+    } else {
+      $('#searchInp').prop('disabled', false);
+    }
+  });
+
+  /*SEARCH BAR FOR PERSONNEL*/
+  $("#searchInp").on("keyup", function () {
+    let searchTerm = $(this).val().trim(); //get search input value
+    console.log(searchTerm);
+
+    if (searchTerm.length > 0) {
+      $.ajax({
+        url: "http://localhost:8080/itcareerswitch/project2/libs/php/SearchAll.php",
+        type: "GET",
+        dataType: "json",
+        data: { txt: searchTerm },
+        success: function (result) {
+          console.log("Filtered: ", result);
+
+          if(result.status.code == 200) {
+            let resultsArray = result.data.found;
+
+            const $personnelTableBody = $('#personnelTableBody');
+            $personnelTableBody.empty(); //clear the table before displaying new results
+
+            if (resultsArray.length > 0) {
+              $.each(result.data.found, function(index, person) {
+                //create a new row and its columns
+                const $tr = $('<tr></tr>');
+
+                //column for Name/Department/Location/JobTitle/Email/Buttons
+                const $Name = $('<td class="align-middle text-nowrap"></td>').text(`${person.lastName}, ${person.firstName}`);
+                const $Department = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.departmentName}`);
+                const $Location = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.locationName}`);
+                const $JobTitle = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.jobTitle}`);
+                const $Email = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.email}`);
+                const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
+
+                //Modify Button
+                const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="' + person.id + '"></button>');
+                $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
+
+                //Delete Button
+                const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="' + person.id + '"></button>');
+                $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
+
+                //Append the buttons to the button cell
+                $buttonCell.append($editButton).append($deleteButton);
+
+                //Append the columns to the row
+                $tr.append($Name).append($Department).append($Location).append($JobTitle).append($Email).append($buttonCell);
+
+                //Append the row to the table body
+                $personnelTableBody.append($tr);
+
+              })
+            } else {
+              //If no result found, display a message
+              $personnelTableBody.append('<tr><td colspan="6" class="text-center">No results found.</td></tr>');
+            }
+          }
+        } 
+      })
+    } else {
+      // If search is empty, reload all data
+      $.ajax({
+        url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAll.php",
+        type: 'GET',
+        dataType: 'json',
+        success: function (result) {
+          if (result.status.code === '200')  {
+            const $personnelTableBody = $('#personnelTableBody');
+            
+            $personnelTableBody.empty(); //clear the table before displaying new results
+
+            $.each(result.data, function(index, person) {
+              //create a new row and its columns
+              const $tr = $('<tr></tr>');
+      
+              //column for Name/Department/Location/JobTitle/Email/Buttons
+              const $Name = $('<td class="align-middle text-nowrap"></td>').text(`${person.lastName}, ${person.firstName}`);
+              const $Department = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.department}`);
+              const $Location = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.location}`);
+              const $JobTitle = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.jobTitle}`);
+              const $Email = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.email}`);
+              const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
+      
+              //Modify Button
+              const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="' + person.id + '"></button>');
+              $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
+      
+              //Delete Button
+              const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="' + person.id + '"></button>');
+              $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
+      
+              //Append the buttons to the button cell
+              $buttonCell.append($editButton).append($deleteButton);
+      
+              //Append the columns to the row
+              $tr.append($Name).append($Department).append($Location).append($JobTitle).append($Email).append($buttonCell);
+      
+              //Append the row to the table body
+              $personnelTableBody.append($tr);
+            })
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading data: ', error);
+          console.log("Response:", xhr.responseText);
+        }
+      })
+    }
+  });
+
+  //Clear the input when the user clicks outside
+  $('#searchInp').on("blur", function() {
+    $(this).val("");
+  })
   
 $("#refreshBtn").click(function () {
     
@@ -256,51 +375,50 @@ $("#refreshBtn").click(function () {
   }
 
 /*DISPLAY EMPLOYEE DATA*/
-  $.ajax({
-    url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAll.php",
-    type: 'GET',
-    dataType: 'json',
-    success: function (result) {
-      if (result.status.code === '200')  {
-        const $personnelTableBody = $('#personnelTableBody');
+$.ajax({
+  url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAll.php",
+  type: 'GET',
+  dataType: 'json',
+  success: function (result) {
+    if (result.status.code === '200')  {
+      const $personnelTableBody = $('#personnelTableBody');
 
-        $.each(result.data, function(index, person) {
-          //create a new row and its columns
-          const $tr = $('<tr></tr>');
+      $.each(result.data, function(index, person) {
+        //create a new row and its columns
+        const $tr = $('<tr></tr>');
 
-          //column for Name/Department/Location/JobTitle/Email/Buttons
-          const $Name = $('<td class="align-middle text-nowrap"></td>').text(`${person.lastName}, ${person.firstName}`);
-          const $Department = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.department}`);
-          const $Location = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.location}`);
-          const $JobTitle = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.jobTitle}`);
-          const $Email = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.email}`);
-          const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
+        //column for Name/Department/Location/JobTitle/Email/Buttons
+        const $Name = $('<td class="align-middle text-nowrap"></td>').text(`${person.lastName}, ${person.firstName}`);
+        const $Department = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.department}`);
+        const $Location = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.location}`);
+        const $JobTitle = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.jobTitle}`);
+        const $Email = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.email}`);
+        const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
 
-          //Modify Button
-          const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="' + person.id + '"></button>');
-          $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
+        //Modify Button
+        const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="' + person.id + '"></button>');
+        $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
 
-          //Delete Button
-          const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="' + person.id + '"></button>');
-          $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
+        //Delete Button
+        const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="' + person.id + '"></button>');
+        $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
 
-          //Append the buttons to the button cell
-          $buttonCell.append($editButton).append($deleteButton);
+        //Append the buttons to the button cell
+        $buttonCell.append($editButton).append($deleteButton);
 
-          //Append the columns to the row
-          $tr.append($Name).append($Department).append($Location).append($JobTitle).append($Email).append($buttonCell);
+        //Append the columns to the row
+        $tr.append($Name).append($Department).append($Location).append($JobTitle).append($Email).append($buttonCell);
 
-          //Append the row to the table body
-          $personnelTableBody.append($tr);
-        })
-      }
-    },
-    error: function(xhr, status, error) {
-      console.error('Error loading data: ', error);
-      console.log("Response:", xhr.responseText);
+        //Append the row to the table body
+        $personnelTableBody.append($tr);
+      })
     }
-  })
-
+  },
+  error: function(xhr, status, error) {
+    console.error('Error loading data: ', error);
+    console.log("Response:", xhr.responseText);
+  }
+})
 
 /*DISPLAY DEPARTMENT DATA*/
   $.ajax({
@@ -841,7 +959,6 @@ $("#refreshBtn").click(function () {
       },
       success: function (result) {
         var resultCode = result.status.code;
-        console.log(result);
 
         if (resultCode == 200) {
           
