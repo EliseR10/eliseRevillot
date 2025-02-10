@@ -314,9 +314,18 @@ $("#searchInp").on("keyup", function () {
   }
 });
 
-  //Clear the input when the user change tabs
+  //User clicks a different tab: reset search input, filters and filter buttons
   $('.nav-link').on('click', function () {
     $('#searchInp').val(''); // Clear search input when clicking on any tab
+    
+    // Reset the filter location selection
+    $('#filterLocationLocation').val('');
+  
+    // Reset the color of the filter button to default (btn-primary)
+    $('#filterBtn').removeClass('btn-success').addClass('btn-primary');
+
+    $('#locationTableBody').empty();
+    displayLocation();
   });
 
   /*REFRESH BUTTON*/
@@ -469,7 +478,10 @@ $("#refreshBtn").click(function () {
             console.error('Error loading data: ', error);
             console.log("Response:", xhr.responseText);
           }
-        })   
+        })  
+        
+        //Reset filter button color
+        $('#filterBtn').removeClass('btn-success').addClass('btn-primary');
     }
     }
 });
@@ -519,6 +531,119 @@ $("#refreshBtn").click(function () {
     // Call function to refresh location table
     refreshLocationsTable();
   });*/
+
+  /*PERSONNEL FILTER BUTTON*/
+  /*DEPARTMENT FILTER BUTTON*/
+
+  /*LOCATION FILTER BUTTON*/
+  //Populate the location list
+  $("#filterLocationModal").on("show.bs.modal", function (e) {
+  $.ajax({
+    url:"http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAllLocations.php",
+    type: "GET",
+    dataType: "json",
+    data: {
+      // Retrieve the data-id attribute from the calling button
+      // see https://getbootstrap.com/docs/5.0/components/modal/#varying-modal-content
+      // for the non-jQuery JavaScript alternative
+    },
+    success: function (result) {
+      console.log(result);
+
+      var resultCode = result.status.code;
+
+      if (resultCode == 200) {
+        
+        // Update the hidden input with the employee id so that
+        // it can be referenced when the form is submitted
+
+        $("#filterLocationLocation").html("");
+
+        $.each(result.data, function (index, location) {
+          $("#filterLocationLocation").append(
+            $("<option>", {
+              value: location.id,
+              text: location.location
+            })
+          );
+        });
+
+        $("#filterLocationLocation").val(result.data[0].id);
+        
+      } else {
+        $("#filterLocationModal .modal-title").replaceWith(
+          "Error retrieving data"
+        );
+      }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      $("#filterLocationModal .modal-title").replaceWith(
+        "Error retrieving data"
+      );
+    }
+  })
+});
+
+$('#filterLocationForm').on('submit', function(event) {
+  event.preventDefault(); // Prevent the form submission (page reload)
+
+  const locationID = $('#filterLocationLocation').val();
+
+  if (locationID) {
+  $.ajax({
+    url: 'http://localhost:8080/itcareerswitch/project2/libs/php/FILTER/filterLocations.php',
+    type: 'GET',
+    dataType: 'json',
+    data : {
+      id: locationID
+    },
+    success: function(result) {
+      console.log('The location filter return this: ', result);
+      if (result.status.code === '200')  {
+        const $locationTableBody = $('#locationTableBody');
+
+        $locationTableBody.empty(); //clear the table before displaying new results
+
+        $.each(result.data, function(index, location) {
+          //create a new row and its columns
+          const $tr = $('<tr></tr>');
+
+          //column for Name/Department/Location/JobTitle/Email/Buttons
+          const $Location = $('<td class="align-middle text-nowrap"></td>').text(`${location.name}`);
+          const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
+
+          //Modify Button
+          const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editLocationModal" data-id="' + location.id + '"></button>');
+          $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
+
+          //Delete Button
+          const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deleteLocationModal" data-id="' + location.id + '"></button>');
+          $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
+
+          //Append the buttons to the button cell
+          $buttonCell.append($editButton).append($deleteButton);
+
+          //Append the columns to the row
+          $tr.append($Location).append($buttonCell);
+
+          //Append the row to the table body
+          $locationTableBody.append($tr);
+
+          //Close Modal
+          $('#filterLocationModal').modal("hide");
+
+          //Make the filter button different color when filters selected
+          $('#filterBtn').removeClass('btn-primary').addClass('btn-success');
+        })
+    }
+    },
+    error: function(xhr, status, error) {
+      console.error('Error loading data: ', error);
+      console.log("Response:", xhr.responseText);
+    }
+  })
+  }
+});
 
 
 /*DISPLAY EMPLOYEE DATA*/
