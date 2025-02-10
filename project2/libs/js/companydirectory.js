@@ -440,7 +440,7 @@ $("#refreshBtn").click(function () {
     })
     //Reset filter button color
     $('#filterBtn').removeClass('btn-success').addClass('btn-primary');
-    
+
   } else {
         // Call function to refresh locations table
         $.ajax({
@@ -545,38 +545,7 @@ $("#refreshBtn").click(function () {
   /*Personnel Filter Button*/
 
   /*Department Filter Button*/
-  /*Populate department selection in filterDepartmentModal*/
   $('#filterDepartmentModal').on('show.bs.modal', function() {
-    $.ajax({
-      url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAllDepartments.php",
-      type: 'GET',
-      dataType: 'json',
-      success: function (result) {
-        console.log(result);
-  
-        var resultCode = result.status.code;
-  
-        if (resultCode == 200) {
-          
-          // Update the hidden input with the employee id so that
-          // it can be referenced when the form is submitted
-  
-          $("#filterDepartmentDepartment").html("");
-  
-          $.each(result.data, function (index, department) {
-            $("#filterDepartmentDepartment").append(
-              $("<option>", {
-                value: department.id,
-                text: department.name
-              })
-            );
-          });
-  
-          $("#filterDepartmentDepartment").val(result.data[0].id);
-        }
-      }
-    })
-
       /*Populate location selection in filterDepartmentModal*/
       $.ajax({
         url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAllLocations.php",
@@ -617,18 +586,16 @@ $("#refreshBtn").click(function () {
   //Set the filters
   $('#filterDepartmentForm').on('submit', function(event) {
     event.preventDefault(); // Prevent the form submission (page reload)
-  
-    const departmentID = $('#filterDepartmentDepartment').val();
+
     const locationID = $('#filterDepartmentLocation').val();
   
-    if (departmentID && locationID) {
+    if (locationID) {
     $.ajax({
       url: 'http://localhost:8080/itcareerswitch/project2/libs/php/FILTER/filterDepartments.php',
       type: 'GET',
       dataType: 'json',
       data : {
         locationID: locationID,
-        departmentID: departmentID
       },
       success: function(result) {
         console.log('The department filter return this: ', result);
@@ -694,17 +661,10 @@ $("#refreshBtn").click(function () {
     url:"http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAllLocations.php",
     type: "GET",
     dataType: "json",
-    data: {
-      // Retrieve the data-id attribute from the calling button
-      // see https://getbootstrap.com/docs/5.0/components/modal/#varying-modal-content
-      // for the non-jQuery JavaScript alternative
-    },
     success: function (result) {
       console.log(result);
 
-      var resultCode = result.status.code;
-
-      if (resultCode == 200) {
+      if (result.status.code === '200')  {
         
         // Update the hidden input with the employee id so that
         // it can be referenced when the form is submitted

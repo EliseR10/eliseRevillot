@@ -36,9 +36,9 @@
 
 	// SQL statement accepts parameters and so is prepared to avoid SQL injection.
 	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
-	$query = $conn->prepare('SELECT d.id AS departmentID, d.name AS departmentName, l.id AS locationID, l.name AS locationName FROM department d LEFT JOIN location l ON d.locationID = l.id WHERE d.id = ? AND d.locationID = ?');
+	$query = $conn->prepare('SELECT d.id AS departmentID, d.name AS departmentName, l.id AS locationID, l.name AS locationName FROM department d LEFT JOIN location l ON d.locationID = l.id WHERE d.locationID = ?');
 
-	$query->bind_param("ii", $_REQUEST['departmentID'], $_REQUEST['locationID']);
+	$query->bind_param("i", $_REQUEST['locationID']);
 
 	$query->execute();
 	
