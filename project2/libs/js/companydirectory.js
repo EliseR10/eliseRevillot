@@ -123,158 +123,63 @@ $(document).ready(function() {
   $('#searchInp').on("blur", function() {
     $(this).val("");
   })
-  
+
+  /*REFRESH BUTTON*/
 $("#refreshBtn").click(function () {
-    
   if ($("#personnelBtn").hasClass("active")) {
-      
-      // Refresh personnel table
+      // Call function to refresh personnel table
+      $.ajax({
+        url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAll.php",
+        type: 'GET',
+        dataType: 'json',
+        success: function (result) {
+          if (result.status.code === '200')  {
+            const $personnelTableBody = $('#personnelTableBody');
+  
+            //Empty the current table body to avoid duplicate rows
+            $personnelTableBody.empty();
+    
+            $.each(result.data, function(index, person) {
+              //create a new row and its columns
+              const $tr = $('<tr></tr>');
+    
+              //column for Name/Department/Location/JobTitle/Email/Buttons
+              const $Name = $('<td class="align-middle text-nowrap"></td>').text(`${person.lastName}, ${person.firstName}`);
+              const $Department = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.department}`);
+              const $Location = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.location}`);
+              const $JobTitle = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.jobTitle}`);
+              const $Email = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.email}`);
+              const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
+    
+              //Modify Button
+              const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="' + person.id + '"></button>');
+              $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
+    
+              //Delete Button
+              const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="' + person.id + '"></button>');
+              $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
+    
+              //Append the buttons to the button cell
+              $buttonCell.append($editButton).append($deleteButton);
+    
+              //Append the columns to the row
+              $tr.append($Name).append($Department).append($Location).append($JobTitle).append($Email).append($buttonCell);
+    
+              //Append the row to the table body
+              $personnelTableBody.append($tr);
+            })
+            alert('Personnel table has been refreshed.');
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading data: ', error);
+          console.log("Response:", xhr.responseText);
+        }
+      });
       
   } else {
       
     if ($("#departmentsBtn").hasClass("active")) {
-        
-        // Refresh department table
-        
-    } else {
-        
-        // Refresh location table
-        
-    }
-      
-    }
-    
-});
-  
-  $("#filterBtn").click(function () {
-    
-    // Open a modal of your own design that allows the user to apply a filter to the personnel table on either department or location
-    const modal = {
-      personnelBtn: '#filterEmployeeModal',
-      departmentsBtn: '#filterDepartmentModal',
-      locationsBtn: '#filterLocationModal',
-    };
-
-    let activeTab = $('.nav-link.active').attr('id'); //grab the id of the current active tab
-
-    if (activeTab && modal[activeTab]) {
-      $(modal[activeTab]).modal("show");
-    }
-  });
-  
-  $("#addBtn").click(function () {
-    
-    // Replicate the logic of the refresh button click to open the add modal for the table that is currently on display
-    const modal = {
-      personnelBtn: '#addPersonnelModal',
-      departmentsBtn: '#addDepartmentModal',
-      locationsBtn: '#addLocationModal',
-    };
-
-    let activeTab = $('.nav-link.active').attr('id'); //grab the id of the current active tab
-
-    if (activeTab && modal[activeTab]) {
-      $(modal[activeTab]).modal("show");
-    }
-  });
-  
-  /*Refresh depending which tab is active*/
-  $('#refreshBtn').click(function () {
-    const modal = {
-      personnelBtn: '#addPersonnelModal',
-      departmentsBtn: '#addDepartmentModal',
-      locationsBtn: '#addLocationModal',
-    }
-
-    let activeTab = $('.nav-link.active').attr('id');
-
-    if (activeTab && modal[activeTab]) {
-      switch (activeTab) {
-        case 'personnelBtn':
-          refreshPersonnelTable();
-          break;
-        case 'departmentsBtn':
-          refreshDepartmentsTable();
-          break;
-        case 'locationsBtn':
-          refreshLocationsTable();
-          break;
-        default:
-          console.log('No active tab found');
-        }
-    }
-  })
-  
-
-  /*$("#personnelBtn").click(function () {
-    
-    // Call function to refresh personnel table
-    
-  });
-  
-  $("#departmentsBtn").click(function () {
-  
-  });
-
-  $("#locationsBtn").click(function () {
-    
-    // Call function to refresh location table
-    
-  });*/
-
-  function refreshPersonnelTable() {
-    // Call function to refresh personnel table
-    $.ajax({
-      url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAll.php",
-      type: 'GET',
-      dataType: 'json',
-      success: function (result) {
-        if (result.status.code === '200')  {
-          const $personnelTableBody = $('#personnelTableBody');
-
-          //Empty the current table body to avoid duplicate rows
-          $personnelTableBody.empty();
-  
-          $.each(result.data, function(index, person) {
-            //create a new row and its columns
-            const $tr = $('<tr></tr>');
-  
-            //column for Name/Department/Location/JobTitle/Email/Buttons
-            const $Name = $('<td class="align-middle text-nowrap"></td>').text(`${person.lastName}, ${person.firstName}`);
-            const $Department = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.department}`);
-            const $Location = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.location}`);
-            const $JobTitle = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.jobTitle}`);
-            const $Email = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.email}`);
-            const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
-  
-            //Modify Button
-            const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="' + person.id + '"></button>');
-            $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
-  
-            //Delete Button
-            const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="' + person.id + '"></button>');
-            $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
-  
-            //Append the buttons to the button cell
-            $buttonCell.append($editButton).append($deleteButton);
-  
-            //Append the columns to the row
-            $tr.append($Name).append($Department).append($Location).append($JobTitle).append($Email).append($buttonCell);
-  
-            //Append the row to the table body
-            $personnelTableBody.append($tr);
-          })
-          alert('Personnel table has been refreshed.');
-        }
-      },
-      error: function(xhr, status, error) {
-        console.error('Error loading data: ', error);
-        console.log("Response:", xhr.responseText);
-      }
-    })
-  };
-
-  function refreshDepartmentsTable() {
     // Call function to refresh department table
     $.ajax({
       url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAllDepartmentsDisplay.php",
@@ -323,56 +228,105 @@ $("#refreshBtn").click(function () {
         console.log("Response:", xhr.responseText);
       }
     })
-  };
+  } else {
+        // Call function to refresh locations table
+        $.ajax({
+          url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAllLocations.php",
+          type: 'GET',
+          dataType: 'json',
+          success: function (result) {
+    
+            if (result.status.code === '200')  {
+              const $locationTableBody = $('#locationTableBody');
+    
+              //Empty the current table body to avoid duplicate rows
+              $locationTableBody.empty();
+    
+              $.each(result.data, function(index, location) {
+                //create a new row and its columns
+                const $tr = $('<tr></tr>');
+    
+                //column for Name/Department/Location/JobTitle/Email/Buttons
+                const $Location = $('<td class="align-middle text-nowrap"></td>').text(`${location.location}`);
+                const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
+    
+                //Modify Button
+                const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editLocationModal" data-id="' + location.id + '"></button>');
+                $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
+    
+                //Delete Button
+                const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deleteLocationModal" data-id="' + location.id + '"></button>');
+                $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
+    
+                //Append the buttons to the button cell
+                $buttonCell.append($editButton).append($deleteButton);
+    
+                //Append the columns to the row
+                $tr.append($Location).append($buttonCell);
+    
+                //Append the row to the table body
+                $locationTableBody.append($tr);
+              })
+                alert('Locations Table has been refreshed.');
+            }
+          },
+          error: function(xhr, status, error) {
+            console.error('Error loading data: ', error);
+            console.log("Response:", xhr.responseText);
+          }
+        })   
+    }
+    }
+});
   
-  function refreshLocationsTable() {
-    // Call function to refresh locations table
-    $.ajax({
-      url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAllLocations.php",
-      type: 'GET',
-      dataType: 'json',
-      success: function (result) {
+  $("#filterBtn").click(function () {
+    
+    // Open a modal of your own design that allows the user to apply a filter to the personnel table on either department or location
+    const modal = {
+      personnelBtn: '#filterEmployeeModal',
+      departmentsBtn: '#filterDepartmentModal',
+      locationsBtn: '#filterLocationModal',
+    };
 
-        if (result.status.code === '200')  {
-          const $locationTableBody = $('#locationTableBody');
+    let activeTab = $('.nav-link.active').attr('id'); //grab the id of the current active tab
 
-          //Empty the current table body to avoid duplicate rows
-          $locationTableBody.empty();
+    if (activeTab && modal[activeTab]) {
+      $(modal[activeTab]).modal("show");
+    }
+  });
+  
+  $("#addBtn").click(function () {
+    
+    // Replicate the logic of the refresh button click to open the add modal for the table that is currently on display
+    const modal = {
+      personnelBtn: '#addPersonnelModal',
+      departmentsBtn: '#addDepartmentModal',
+      locationsBtn: '#addLocationModal',
+    };
 
-          $.each(result.data, function(index, location) {
-            //create a new row and its columns
-            const $tr = $('<tr></tr>');
+    let activeTab = $('.nav-link.active').attr('id'); //grab the id of the current active tab
 
-            //column for Name/Department/Location/JobTitle/Email/Buttons
-            const $Location = $('<td class="align-middle text-nowrap"></td>').text(`${location.location}`);
-            const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
+    if (activeTab && modal[activeTab]) {
+      $(modal[activeTab]).modal("show");
+    }
+  });
 
-            //Modify Button
-            const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editLocationModal" data-id="' + location.id + '"></button>');
-            $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
+  /*$("#personnelBtn").click(function () {
+    
+    // Call function to refresh personnel table
+    refreshPersonnelTable();
+  });
+  
+  $("#departmentsBtn").click(function () {
+    refreshDepartmentsTable();
+  });
 
-            //Delete Button
-            const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deleteLocationModal" data-id="' + location.id + '"></button>');
-            $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
+  $("#locationsBtn").click(function () {
+    
+    // Call function to refresh location table
+    refreshLocationsTable();
+  });*/
 
-            //Append the buttons to the button cell
-            $buttonCell.append($editButton).append($deleteButton);
-
-            //Append the columns to the row
-            $tr.append($Location).append($buttonCell);
-
-            //Append the row to the table body
-            $locationTableBody.append($tr);
-          })
-            alert('Locations Table has been refreshed.');
-        }
-      },
-      error: function(xhr, status, error) {
-        console.error('Error loading data: ', error);
-        console.log("Response:", xhr.responseText);
-      }
-    })
-  }
 
 /*DISPLAY EMPLOYEE DATA*/
 $.ajax({
