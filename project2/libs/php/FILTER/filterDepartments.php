@@ -1,13 +1,12 @@
 <?php
-	header("Access-Control-Allow-Origin: *"); // Allow all origins
+    header("Access-Control-Allow-Origin: *"); // Allow all origins
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS"); // Allow specific methods
     header("Access-Control-Allow-Headers: Content-Type, Authorization, User-Agent"); // Allow specific headers
-	
 	// example use from browser
-	// http://localhost/companydirectory/libs/php/getAllDepartments.php
+	// http://localhost/companydirectory/libs/php/getDepartmentByID.php?id=<id>
 
 	// remove next two lines for production	
-	
+
 	ini_set('display_errors', 'On');
 	error_reporting(E_ALL);
 
@@ -26,37 +25,39 @@
 		$output['status']['description'] = "database unavailable";
 		$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 		$output['data'] = [];
-
+		
 		mysqli_close($conn);
 
 		echo json_encode($output);
-
+		
 		exit;
 
 	}	
 
-	// SQL does not accept parameters and so is not prepared
+	// SQL statement accepts parameters and so is prepared to avoid SQL injection.
+	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
+	$query = $conn->prepare('SELECT d.id AS departmentID, d.name AS departmentName, l.id AS locationID, l.name AS locationName FROM department d LEFT JOIN location l ON d.locationID = l.id WHERE d.id = ? AND d.locationID = ?');
 
-	$query = 'SELECT id, name, locationID FROM department ORDER BY name ASC';
+	$query->bind_param("ii", $_REQUEST['departmentID'], $_REQUEST['locationID']);
 
-	$result = $conn->query($query);
+	$query->execute();
 	
-	if (!$result) {
+	if (false === $query) {
 
 		$output['status']['code'] = "400";
 		$output['status']['name'] = "executed";
 		$output['status']['description'] = "query failed";	
 		$output['data'] = [];
 
-		mysqli_close($conn);
-
 		echo json_encode($output); 
-
+	
+		mysqli_close($conn);
 		exit;
 
 	}
-   
-  $data = [];
+    
+    $result = $query->get_result();
+   	$data = [];
 
 	while ($row = mysqli_fetch_assoc($result)) {
 
@@ -69,9 +70,9 @@
 	$output['status']['description'] = "success";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 	$output['data'] = $data;
-	
-	mysqli_close($conn);
 
 	echo json_encode($output); 
+
+	mysqli_close($conn);
 
 ?>

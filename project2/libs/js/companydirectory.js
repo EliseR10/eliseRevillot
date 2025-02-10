@@ -324,6 +324,12 @@ $("#searchInp").on("keyup", function () {
     // Reset the color of the filter button to default (btn-primary)
     $('#filterBtn').removeClass('btn-success').addClass('btn-primary');
 
+    $('#personnelTableBody').empty();
+    displayPersonnel();
+
+    $('#departmentTableBody').empty();
+    displayDepartment();
+
     $('#locationTableBody').empty();
     displayLocation();
   });
@@ -432,6 +438,9 @@ $("#refreshBtn").click(function () {
         console.log("Response:", xhr.responseText);
       }
     })
+    //Reset filter button color
+    $('#filterBtn').removeClass('btn-success').addClass('btn-primary');
+    
   } else {
         // Call function to refresh locations table
         $.ajax({
@@ -532,8 +541,151 @@ $("#refreshBtn").click(function () {
     refreshLocationsTable();
   });*/
 
-  /*PERSONNEL FILTER BUTTON*/
-  /*DEPARTMENT FILTER BUTTON*/
+  /*FILTER*/
+  /*Personnel Filter Button*/
+
+  /*Department Filter Button*/
+  /*Populate department selection in filterDepartmentModal*/
+  $('#filterDepartmentModal').on('show.bs.modal', function() {
+    $.ajax({
+      url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAllDepartments.php",
+      type: 'GET',
+      dataType: 'json',
+      success: function (result) {
+        console.log(result);
+  
+        var resultCode = result.status.code;
+  
+        if (resultCode == 200) {
+          
+          // Update the hidden input with the employee id so that
+          // it can be referenced when the form is submitted
+  
+          $("#filterDepartmentDepartment").html("");
+  
+          $.each(result.data, function (index, department) {
+            $("#filterDepartmentDepartment").append(
+              $("<option>", {
+                value: department.id,
+                text: department.name
+              })
+            );
+          });
+  
+          $("#filterDepartmentDepartment").val(result.data[0].id);
+        }
+      }
+    })
+
+      /*Populate location selection in filterDepartmentModal*/
+      $.ajax({
+        url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAllLocations.php",
+        type: 'GET',
+        dataType: 'json',
+        success: function (result) {
+          console.log(result);
+  
+          var resultCode = result.status.code;
+  
+          if (resultCode == 200) {
+          
+            // Update the hidden input with the employee id so that
+            // it can be referenced when the form is submitted
+  
+            $("#filterDepartmentLocation").html("");
+  
+            $.each(result.data, function (index, location) {
+              $("#filterDepartmentLocation").append(
+                $("<option>", {
+                  value: location.id,
+                  text: location.location
+                })
+              );
+            });
+  
+            $("#filterDepartmentLocation").val(result.data[0].id);
+          
+          } else {
+            $("#filterDepartmentModal .modal-title").replaceWith(
+              "Error retrieving data"
+            );
+          }
+        }
+      })
+  })
+
+  //Set the filters
+  $('#filterDepartmentForm').on('submit', function(event) {
+    event.preventDefault(); // Prevent the form submission (page reload)
+  
+    const departmentID = $('#filterDepartmentDepartment').val();
+    const locationID = $('#filterDepartmentLocation').val();
+  
+    if (departmentID && locationID) {
+    $.ajax({
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/FILTER/filterDepartments.php',
+      type: 'GET',
+      dataType: 'json',
+      data : {
+        locationID: locationID,
+        departmentID: departmentID
+      },
+      success: function(result) {
+        console.log('The department filter return this: ', result);
+        const $departmentTableBody = $('#departmentTableBody');
+  
+        $departmentTableBody.empty(); //clear the table before displaying new results
+        
+        if (result.status.code === '200' && result.data.length > 0)  {
+          $.each(result.data, function(index, department) {
+            //create a new row and its columns
+            const $tr = $('<tr></tr>');
+  
+            //column for Name/Department/Location/JobTitle/Email/Buttons
+            const $Name = $('<td class="align-middle text-nowrap"></td>').text(`${department.departmentName}`);
+            const $Location = $('<td class="align-middle text-nowrap"></td>').text(`${department.locationName}`);
+            const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
+  
+            //Modify Button
+            const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" data-id="' + department.departmentID + '"></button>');
+            $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
+  
+            //Delete Button
+            const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deleteDepartmentModal" data-id="' + department.departmentID + '"></button>');
+            $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
+  
+            //Append the buttons to the button cell
+            $buttonCell.append($editButton).append($deleteButton);
+  
+            //Append the columns to the row
+            $tr.append($Name).append($Location).append($buttonCell);
+  
+            //Append the row to the table body
+            $departmentTableBody.append($tr);
+  
+            //Close Modal
+            $('#filterDepartmentModal').modal("hide");
+  
+            //Make the filter button different color when filters selected
+            $('#filterBtn').removeClass('btn-primary').addClass('btn-success');
+          })
+        } else {
+          //Close Modal
+          $('#filterDepartmentModal').modal("hide");
+  
+          //Make the filter button different color when filters selected
+          $('#filterBtn').removeClass('btn-primary').addClass('btn-success');
+
+          $departmentTableBody.append('<tr><td colspan="6" class="text-center">No results found.</td></tr>');
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Error loading data: ', error);
+        console.log("Response:", xhr.responseText);
+      }
+    })
+    }
+  });
 
   /*LOCATION FILTER BUTTON*/
   //Populate the location list
@@ -644,7 +796,6 @@ $('#filterLocationForm').on('submit', function(event) {
   })
   }
 });
-
 
 /*DISPLAY EMPLOYEE DATA*/
 function displayPersonnel() {
