@@ -386,7 +386,8 @@ $("#refreshBtn").click(function () {
           console.log("Response:", xhr.responseText);
         }
       });
-      
+      //Reset filter button color
+      $('#filterBtn').removeClass('btn-success').addClass('btn-primary');
   } else {
       
     if ($("#departmentsBtn").hasClass("active")) {
@@ -543,6 +544,114 @@ $("#refreshBtn").click(function () {
 
   /*FILTER*/
   /*Personnel Filter Button*/
+  $('#filterEmployeeModal').on('show.bs.modal', function() {
+    /*Populate location selection in filterDepartmentModal*/
+    $.ajax({
+      url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAllDepartments.php",
+      type: 'GET',
+      dataType: 'json',
+      success: function (result) {
+        console.log(result);
+
+        var resultCode = result.status.code;
+
+        if (resultCode == 200) {
+        
+          // Update the hidden input with the employee id so that
+          // it can be referenced when the form is submitted
+
+          $("#filterEmployeeDepartment").html("");
+
+          $.each(result.data, function (index, department) {
+            $("#filterEmployeeDepartment").append(
+              $("<option>", {
+                value: department.id,
+                text: department.name
+              })
+            );
+          });
+
+          $("#filterEmployeeDepartment").val(result.data[0].id);
+        
+        } else {
+          $("#filterEmployeeModal .modal-title").replaceWith(
+            "Error retrieving data"
+          );
+        }
+      }
+    })
+  })
+
+  //Set the filters
+  $('#filterEmployeeForm').on('submit', function(event) {
+    event.preventDefault(); // Prevent the form submission (page reload)
+
+    const departmentID = $('#filterEmployeeDepartment').val();
+  
+    if (departmentID) {
+      $.ajax({
+        url: 'http://localhost:8080/itcareerswitch/project2/libs/php/FILTER/filterPersonnel.php',
+        type: 'GET',
+        dataType: 'json',
+        data : {
+          departmentID: departmentID,
+        },
+        success: function (result) {
+          const $personnelTableBody = $('#personnelTableBody');
+        
+          $personnelTableBody.empty(); //clear the table before displaying new results
+
+          if (result.status.code === '200' && result.data.length > 0)  {
+            console.log(result);
+
+            $.each(result.data, function(index, person) {
+              //create a new row and its columns
+              const $tr = $('<tr></tr>');
+
+              //column for Name/Department/Location/JobTitle/Email/Buttons
+              const $Name = $('<td class="align-middle text-nowrap"></td>').text(`${person.lastName}, ${person.firstName}`);
+              const $Department = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.departmentName}`);
+              const $Location = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.location}`);
+              const $JobTitle = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.jobTitle}`);
+              const $Email = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.email}`);
+              const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
+
+              //Modify Button
+              const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="' + person.id + '"></button>');
+              $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
+
+              //Delete Button
+              const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="' + person.id + '"></button>');
+              $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
+
+              //Append the buttons to the button cell
+              $buttonCell.append($editButton).append($deleteButton);
+
+              //Append the columns to the row
+              $tr.append($Name).append($Department).append($Location).append($JobTitle).append($Email).append($buttonCell);
+
+              //Append the row to the table body
+              $personnelTableBody.append($tr);
+
+              //Close Modal
+              $('#filterEmployeeModal').modal("hide");
+  
+              //Make the filter button different color when filters selected
+              $('#filterBtn').removeClass('btn-primary').addClass('btn-success');
+            })
+          } else {
+            //Close Modal
+            $('#filterEmployeeModal').modal("hide");
+  
+            //Make the filter button different color when filters selected
+            $('#filterBtn').removeClass('btn-primary').addClass('btn-success');
+
+            $personnelTableBody.append('<tr><td colspan="6" class="text-center">No results found.</td></tr>');
+          }
+        }
+      })
+    }
+  })
 
   /*Department Filter Button*/
   $('#filterDepartmentModal').on('show.bs.modal', function() {
@@ -652,7 +761,7 @@ $("#refreshBtn").click(function () {
       }
     })
     }
-  });
+  })
 
   /*LOCATION FILTER BUTTON*/
   //Populate the location list
