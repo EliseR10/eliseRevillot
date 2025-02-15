@@ -296,7 +296,16 @@ $(document).ready(function() {
                 $('#locationTableBody').append(frag);
 
               } else {
-                $locationTableBody.append('<tr><td colspan="6" class="text-center">No results found.</td></tr>');
+                  var row = document.createElement("tr");
+
+                  var noResult = document.createElement("td");
+                  noResult.className = "text-center";
+                  var noResultText = document.createTextNode('No results found.');
+                  noResult.append(noResultText);
+                
+                  row.append(noResult);
+                  frag.append(row);
+                  $('#locationTableBody').append(frag);
               }
             }
           },
@@ -931,7 +940,7 @@ $(document).ready(function() {
           // Update the hidden input with the employee id so that
           // it can be referenced when the form is submitted
 
-          $("#filterEmployeeDepartment").html("");
+          $("#filterEmployeeDepartment").html("<option value='all'>All</option>");
 
           $.each(result.data, function (index, department) {
             $("#filterEmployeeDepartment").append(
@@ -942,7 +951,7 @@ $(document).ready(function() {
             );
           });
 
-          $("#filterEmployeeDepartment").val(result.data[0].id);
+          $("#filterEmployeeDepartment").val('all');
         
         } else {
           $("#filterEmployeeModal .modal-title").replaceWith(
@@ -964,7 +973,7 @@ $(document).ready(function() {
           // Update the hidden input with the employee id so that
           // it can be referenced when the form is submitted
 
-          $("#filterEmployeeLocation").html("");
+          $("#filterEmployeeLocation").html("<option value='all'>All</option>");
 
           $.each(result.data, function (index, location) {
             $("#filterEmployeeLocation").append(
@@ -975,7 +984,7 @@ $(document).ready(function() {
             );
           });
 
-          $("#filterEmployeeLocation").val(result.data[0].id);
+          $("#filterEmployeeLocation").val('all');
         
         } else {
           $("#filterEmployeeModal .modal-title").replaceWith(
@@ -984,6 +993,20 @@ $(document).ready(function() {
         }
       }
     })
+
+    //When user select a loc or dep, automatically change the other selection to all
+    $('#filterEmployeeDepartment').on('change', function() {
+      if ($(this).val() !== 'all') {
+        $('#filterEmployeeLocation').val('all');
+      }
+    });
+
+    $('#filterEmployeeLocation').on('change', function() {
+      if ($(this).val() !== 'all') {
+        $('#filterEmployeeDepartment').val('all');
+      }
+    });
+
   })
 
   //Set the filters
@@ -991,58 +1014,118 @@ $(document).ready(function() {
     event.preventDefault(); // Prevent the form submission (page reload)
 
     const departmentID = $('#filterEmployeeDepartment').val();
-  
-    if (departmentID) {
+    const locationID = $('#filterEmployeeLocation').val();
+
+    const filteredParams = {};
+    if (departmentID !== 'all') {
+      filteredParams.departmentID = departmentID;
+    }
+    if (locationID !== 'all') {
+      filteredParams.locationID = locationID;
+    }
+
+    console.log('The filtered params are: ', filteredParams);
+
       $.ajax({
         url: 'http://localhost:8080/itcareerswitch/project2/libs/php/FILTER/filterPersonnel.php',
         type: 'GET',
         dataType: 'json',
-        data : {
-          departmentID: departmentID,
-        },
+        data : filteredParams,
         success: function (result) {
           const $personnelTableBody = $('#personnelTableBody');
         
           $personnelTableBody.empty(); //clear the table before displaying new results
+          const personnelData = result.data;
+          var frag = document.createDocumentFragment();
 
           if (result.status.code === '200' && result.data.length > 0)  {
-            console.log(result);
+            console.log(result.data);
 
-            $.each(result.data, function(index, person) {
-              //create a new row and its columns
-              const $tr = $('<tr></tr>');
+            personnelData.forEach(person => {
+              var row = document.createElement("tr");
+                       
+              var id = document.createElement("td");
+              id.classList.add("hidden-id");
+              id.setAttribute("data-id", person.id);
+              id.textContent = person.id;
+              row.appendChild(id);
+            
+              var name = document.createElement("td");
+              name.classList.add("name-cell");
+              var nameText = document.createTextNode(`${person.lastName}, ${person.firstName}`);
+              name.append(nameText);
+            
+              row.append(name);
 
-              //column for Name/Department/Location/JobTitle/Email/Buttons
-              const $Name = $('<td class="align-middle text-nowrap"></td>').text(`${person.lastName}, ${person.firstName}`);
-              const $Department = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.departmentName}`);
-              const $Location = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.location}`);
-              const $JobTitle = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.jobTitle}`);
-              const $Email = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.email}`);
-              const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
+              var department = document.createElement("td");
+              var departmentName = document.createTextNode(person.departmentName || 'N/A');
+              department.append(departmentName);
+            
+              row.append(department);
 
-              //Modify Button
-              const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="' + person.id + '"></button>');
-              $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
+              var location = document.createElement("td");
+              var locationName = document.createTextNode(person.location || 'N/A');
+              location.append(locationName);
+            
+              row.append(location);
 
-              //Delete Button
-              const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="' + person.id + '"></button>');
-              $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
+              var jobTitle = document.createElement("td");
+              var jobTitleName = document.createTextNode(person.jobTitle || 'N/A');
+              jobTitle.append(jobTitleName);
+            
+              row.append(jobTitle);  
+            
+              var email = document.createElement("td");
+              var emailName = document.createTextNode(person.email || 'N/A');
+              email.append(emailName);
+            
+              row.append(email);     
+            
+              // Create the Modify button
+              var editButton = document.createElement("button");
+              editButton.className = "btn btn-primary btn-sm editBtn";
+              editButton.setAttribute("data-bs-toggle", "modal");
+              editButton.setAttribute("data-bs-target", "#editPersonnelModal");
+              editButton.setAttribute("data-id", person.id);
 
-              //Append the buttons to the button cell
-              $buttonCell.append($editButton).append($deleteButton);
+              // Add the Font Awesome icon inside the button
+              var editIcon = document.createElement("i");
+              editIcon.className = "fa-solid fa-pencil fa-fw";
+              editButton.append(editIcon);
 
-              //Append the columns to the row
-              $tr.append($Name).append($Department).append($Location).append($JobTitle).append($Email).append($buttonCell);
+              // Create the Delete button
+              var deleteButton = document.createElement("button");
+              deleteButton.className = "btn btn-primary btn-sm";
+              deleteButton.setAttribute("data-bs-toggle", "modal");
+              deleteButton.setAttribute("data-bs-target", "#deletePersonnelModal");
+              deleteButton.setAttribute("data-id", person.id);
 
-              //Append the row to the table body
-              $personnelTableBody.append($tr);
+              // Add the Font Awesome icon inside the button
+              var deleteIcon = document.createElement("i");
+              deleteIcon.className = "fa-solid fa-trash fa-fw";
+              deleteButton.append(deleteIcon);
 
-              //Close Modal
-              $('#filterEmployeeModal').modal("hide");
-  
-              //Make the filter button different color when filters selected
-              $('#filterBtn').removeClass('btn-primary').addClass('btn-success');
+              // Create a table cell to hold the buttons  
+              var buttonCell = document.createElement("td");
+              buttonCell.className = "actions-cell";
+              buttonCell.append(editButton);
+              buttonCell.append(deleteButton);
+
+              // Append the cell to the row
+              row.append(buttonCell); 
+
+              frag.append(row);
+
             })
+
+            $('#personnelTableBody').append(frag);
+
+            //Close Modal
+            $('#filterEmployeeModal').modal("hide");
+  
+            //Make the filter button different color when filters selected
+            $('#filterBtn').removeClass('btn-primary').addClass('btn-success');
+      
           } else {
             //Close Modal
             $('#filterEmployeeModal').modal("hide");
@@ -1050,11 +1133,19 @@ $(document).ready(function() {
             //Make the filter button different color when filters selected
             $('#filterBtn').removeClass('btn-primary').addClass('btn-success');
 
-            $personnelTableBody.append('<tr><td colspan="6" class="text-center">No results found.</td></tr>');
+            var row = document.createElement("tr");
+
+            var noResult = document.createElement("td");
+            noResult.className = "text-center";
+            var noResultText = document.createTextNode('No results found.');
+            noResult.append(noResultText);
+                
+            row.append(noResult);
+            frag.append(row);
+            $('#personnelTableBody').append(frag);
           }
         }
       })
-    }
   })
 
   /*DISPLAY EMPLOYEE DATA*/

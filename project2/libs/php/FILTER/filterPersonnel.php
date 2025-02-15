@@ -34,11 +34,41 @@
 
 	}	
 
+	$departmentID = isset($_REQUEST['departmentID']) ? $_REQUEST['departmentID'] : null;
+	$locationID = isset($_REQUEST['locationID']) ? $_REQUEST['locationID'] : null;
+
 	// SQL statement accepts parameters and so is prepared to avoid SQL injection.
 	// $_REQUEST used for development / debugging. Remember to change to $_POST for production
-	$query = $conn->prepare('SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name AS departmentName, d.id AS departmentID, l.name AS location FROM personnel p LEFT JOIN department d ON d.id = p.departmentID LEFT JOIN location l ON l.id = d.locationID WHERE d.id = ? ORDER BY p.lastName, p.firstName, d.name, l.name');
-
-	$query->bind_param("i", $_REQUEST['departmentID']);
+	
+	if ($departmentID) {
+		$query = $conn->prepare('
+        	SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name AS departmentName, d.id AS departmentID, l.name AS location 
+        	FROM personnel p 
+        	LEFT JOIN department d ON d.id = p.departmentID 
+        	LEFT JOIN location l ON l.id = d.locationID 
+        	WHERE d.id = ? 
+        	ORDER BY p.lastName, p.firstName, d.name, l.name
+    	');
+		$query->bind_param("i", $departmentID);
+	} else if ($locationID) {
+		$query = $conn->prepare('
+        	SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name AS departmentName, d.id AS departmentID, l.name AS location 
+        	FROM personnel p 
+        	LEFT JOIN department d ON d.id = p.departmentID 
+        	LEFT JOIN location l ON l.id = d.locationID 
+        	WHERE l.id = ? 
+        	ORDER BY p.lastName, p.firstName, d.name, l.name
+    	');
+		$query->bind_param("i", $locationID);
+	} else {
+		$query = $conn->prepare('
+        	SELECT p.id, p.lastName, p.firstName, p.jobTitle, p.email, d.name AS departmentName, d.id AS departmentID, l.name AS location 
+        	FROM personnel p 
+        	LEFT JOIN department d ON d.id = p.departmentID 
+        	LEFT JOIN location l ON l.id = d.locationID 
+        	ORDER BY p.lastName, p.firstName, d.name, l.name
+    	');
+	}
 
 	$query->execute();
 	
