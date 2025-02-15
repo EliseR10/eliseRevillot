@@ -567,35 +567,7 @@ $(document).ready(function() {
       }
     }
   });
-
-  //User clicks a different tab: reset search input, filters and filter buttons
-  $('.nav-link').on('click', function () {
-    $('#searchInp').val(''); // Clear search input when clicking on any tab
-    
-    // Reset the filter location selection
-    $('#filterLocationLocation').val('');
   
-    // Reset the color of the filter button to default (btn-primary)
-    $('#filterBtn').removeClass('btn-success').addClass('btn-primary');
-
-    $('#personnelTableBody').empty();
-    displayPersonnel();
-
-    $('#departmentTableBody').empty();
-    displayDepartment();
-
-    $('#locationTableBody').empty();
-    displayLocation();
-
-    let activeTab = $(this).attr('id');
-
-    if (activeTab === "departmentsBtn" || activeTab === "locationsBtn") {
-        $("#filterBtn").prop("disabled", true).addClass("disabled"); // Disable and visually indicate
-    } else {
-        $("#filterBtn").prop("disabled", false).removeClass("disabled"); // Enable it back
-    }
-  });
-
   /*REFRESH BUTTON*/
   $("#refreshBtn").click(function () {
     if ($("#personnelBtn").hasClass("active")) {
@@ -878,19 +850,52 @@ $(document).ready(function() {
   });
 
   $("#personnelBtn").click(function () {
-  
     // Call function to refresh personnel table
-    
+    $('#searchInp').val(''); // Clear search input when clicking on any tab
+
+    // Reset the filter location selection
+    $('#filterLocationLocation').val('');
+  
+    // Reset the color of the filter button to default (btn-primary)
+    $('#filterBtn').removeClass('btn-success').addClass('btn-primary');
+
+    $("#filterBtn").prop("disabled", false).removeClass("disabled"); // Enable it back
+
+    $('#personnelTableBody').empty();
+    displayPersonnel();
   });
   
   $("#departmentsBtn").click(function () {
-    
     // Call function to refresh department table
+    $('#searchInp').val(''); // Clear search input when clicking on any tab
+
+    // Reset the filter location selection
+    $('#filterLocationLocation').val('');
+  
+    // Reset the color of the filter button to default (btn-primary)
+    $('#filterBtn').removeClass('btn-success').addClass('btn-primary');
+
+    $("#filterBtn").prop("disabled", true).addClass("disabled"); // Disable and visually indicate
+
+    $('#departmentTableBody').empty();
+    displayDepartment();
+
   });
   
   $("#locationsBtn").click(function () {
-    
     // Call function to refresh location table
+    $('#searchInp').val(''); // Clear search input when clicking on any tab
+
+    // Reset the filter location selection
+    $('#filterLocationLocation').val('');
+  
+    // Reset the color of the filter button to default (btn-primary)
+    $('#filterBtn').removeClass('btn-success').addClass('btn-primary');
+
+    $("#filterBtn").prop("disabled", true).addClass("disabled"); // Disable and visually indicate
+
+    $('#locationTableBody').empty();
+    displayLocation();
   });
   
   $("#filterBtn").click(function () {
@@ -1149,7 +1154,7 @@ $(document).ready(function() {
   })
 
   /*DISPLAY EMPLOYEE DATA*/
-  function displayPersonnel() { 
+  function displayPersonnel() {
     $.ajax({
       url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAll.php",
       type: 'GET',
@@ -1328,7 +1333,7 @@ $(document).ready(function() {
       }
     })
   }
-  displayDepartment();
+  //displayDepartment();
 
     /*DISPLAY LOCATION DATA*/
     function displayLocation() {
@@ -1403,7 +1408,7 @@ $(document).ready(function() {
       }
     })
   }
-  displayLocation();
+  //displayLocation();
 
   /*ADD PERSONNEL*/
   /*Populate department selection in addPersonnelModal*/
