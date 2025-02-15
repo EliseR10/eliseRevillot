@@ -52,12 +52,33 @@ tr {
   width: 70px;
 }
 
-/* Ensure Actions column is always aligned to the right */
-th.text-end {
-  padding-right: 40px;
+table {
+  width: 100%;  /* Ensures table stretches to full width */
+  border-collapse: collapse; 
 }
 
-/* Optionally, add some margin or padding to separate buttons */
-button.btn {
-  margin-right: 10px;  /* Adjust as necessary */
+.table-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.hidden-id {
+  display: none; /* Hides the ID column */
+}
+
+.name-cell {
+  text-align: left;
+}
+
+.actions-cell {
+  text-align: right;
+  white-space: nowrap; /* Prevents buttons from wrapping */
+  margin-right: 15px;
+}
+
+/* Optionally, add some margin or padding to separate buttons*/
+.editBtn {
+  margin-right: 10px;
 }

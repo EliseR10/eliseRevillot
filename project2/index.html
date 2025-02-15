@@ -69,16 +69,6 @@
             <div class="tab-content bg-white">
                 <div class="tab-pane show active" id="personnel-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                     <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th class="d-md-table-cell">Name</th>
-                                <th class="d-none d-md-table-cell">Department</th>
-                                <th class="d-none d-md-table-cell">Location</th>
-                                <th class="d-none d-md-table-cell">Job Title</th>
-                                <th class="d-none d-md-table-cell">Email</th>
-                                <th class="text-end d-md-table-cell">Actions</th>
-                            </tr>
-                        </thead>
 
                         <!-- Below is an example row. Create a JS function that interogates the database and dynamically creates the HTML for the table contents. -->
                         <tbody id="personnelTableBody">
@@ -90,14 +80,6 @@
                 <!--Table content with Department Data-->
                 <div class="tab-pane" id="departments-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
                     <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th class="d-md-table-cell">Department</th>
-                                <th class="d-md-table-cell">Location</th>
-                                <th class="text-end d-md-table-cell">Actions</th>
-                            </tr>
-                        </thead>
-
                         <!-- Below is an example row. Create a JS function that interogates the database and dynamically creates the HTML for the table contents. -->
                         <tbody id="departmentTableBody">
 
@@ -108,13 +90,6 @@
                 <!--Table content with Location Data-->
                 <div class="tab-pane" id="locations-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
                     <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th class="d-md-table-cell">Location</th>
-                                <th class="text-end d-md-table-cell">Actions</th>
-                            </tr>
-                        </thead>
-
                         <!-- Below is an example row. Create a JS function that interogates the database and dynamically creates the HTML for the table contents. -->
                         <tbody id="locationTableBody">
 
@@ -147,69 +122,16 @@
                                     <select class="form-select" id="filterEmployeeDepartment" placeholder="Department"></select>
                                     <label for="filterEmployeeDepartment">Department</label>
                                 </div>  
+
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" id="filterEmployeeLocation" placeholder="Location"></select>
+                                    <label for="filterEmployeeLocation">Location</label>
+                                </div>
                             </form> 
                         </div>
 
                         <div class="modal-footer">
                             <button type="submit" form="filterEmployeeForm" class="btn btn-outline-primary btn-sm myBtn">SELECT</button>
-                            <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">CANCEL</button>
-                        </div>
-       
-                    </div>
-                </div>
-        </div>
-
-        <div id="filterDepartmentModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <!--the last two classes centre the modal and, if the content is too long, ensures that the header and footer are always on display by making the body scroll -->
-        
-                <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
-                    <div class="modal-content shadow"> 
-            
-                        <div class="modal-header bg-primary bg-gradient text-white">
-                            <h5 class="modal-title">Filter Search</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-      
-                        <div class="modal-body">
-                            <form id="filterDepartmentForm">
-                                <div class="form-floating mb-3">
-                                    <select class="form-select" id="filterDepartmentLocation" placeholder="Location"></select>
-                                    <label for="filterDepartmentLocation">Location</label>
-                                </div>  
-                            </form> 
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="submit" form="filterDepartmentForm" class="btn btn-outline-primary btn-sm myBtn">SELECT</button>
-                            <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">CANCEL</button>
-                        </div>
-       
-                    </div>
-                </div>
-        </div>
-
-        <div id="filterLocationModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <!--the last two classes centre the modal and, if the content is too long, ensures that the header and footer are always on display by making the body scroll -->
-        
-                <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
-                    <div class="modal-content shadow"> 
-            
-                        <div class="modal-header bg-primary bg-gradient text-white">
-                            <h5 class="modal-title">Filter Search</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-      
-                        <div class="modal-body">
-                            <form id="filterLocationForm">
-                                <div class="form-floating mb-3">
-                                    <select class="form-select" id="filterLocationLocation" placeholder="Location"></select>
-                                    <label for="filterLocationLocation">Location</label>
-                                </div>  
-                            </form> 
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="submit" form="filterLocationForm" class="btn btn-outline-primary btn-sm myBtn">SELECT</button>
                             <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">CANCEL</button>
                         </div>
        
@@ -404,8 +326,8 @@
                         </div>
       
                         <div class="modal-footer">
-                            <button type="submit" form="deletePersonnelForm" class="btn btn-outline-primary btn-sm myBtn">DELETE</button>
-                            <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">CANCEL</button>
+                            <button type="submit" form="deletePersonnelForm" class="btn btn-outline-primary btn-sm myBtn">YES</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">NO</button>
                         </div>
 
                     </div>
@@ -468,8 +390,8 @@
                         </div>
       
                         <div class="modal-footer">
-                            <button type="submit" form="deleteDepartmentForm" class="btn btn-outline-primary btn-sm myBtn btn-submit-delete">DELETE</button>
-                            <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">CANCEL</button>
+                            <button type="submit" form="deleteDepartmentForm" class="btn btn-outline-primary btn-sm myBtn btn-submit-delete">YES</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">NO</button>
                         </div>
 
                     </div>
@@ -527,8 +449,8 @@
                         </div>
       
                         <div class="modal-footer">
-                            <button type="submit" form="deleteLocationForm" class="btn btn-outline-primary btn-sm myBtn btn-submit-delete">DELETE</button>
-                            <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">CANCEL</button>
+                            <button type="submit" form="deleteLocationForm" class="btn btn-outline-primary btn-sm myBtn btn-submit-delete">YES</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">NO</button>
                         </div>
 
                     </div>
