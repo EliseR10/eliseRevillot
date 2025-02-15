@@ -12,56 +12,116 @@ $(document).ready(function() {
       if (activeTab === "personnelBtn") {
         $.ajax({
           url: "http://localhost:8080/itcareerswitch/project2/libs/php/SearchAll.php",
-          type: "GET",
-          dataType: "json",
+          type: 'GET',
           data: { txt: searchTerm },
+          dataType: 'json',
           success: function (result) {
 
-            if(result.status.code == 200) {
+            if (result.status.code === '200')  {
+              console.log(result);
               let resultsArray = result.data.found;
 
               const $personnelTableBody = $('#personnelTableBody');
               $personnelTableBody.empty(); //clear the table before displaying new results
 
+              var frag = document.createDocumentFragment();
+             
               if (resultsArray.length > 0) {
                 $.each(result.data.found, function(index, person) {
-                  //create a new row and its columns
-                  const $tr = $('<tr></tr>');
+                var row = document.createElement("tr");
+                           
+                var id = document.createElement("td");
+                id.classList.add("hidden-id");
+                id.setAttribute("data-id", person.id);
+                id.textContent = person.id;
+                row.appendChild(id);
+                
+                var name = document.createElement("td");
+                name.classList.add("name-cell");
+                var nameText = document.createTextNode(`${person.lastName}, ${person.firstName}`);
+                name.append(nameText);
+                
+                row.append(name);
+    
+                var department = document.createElement("td");
+                var departmentName = document.createTextNode(person.departmentName || 'N/A');
+                department.append(departmentName);
+                
+                row.append(department);
+    
+                var location = document.createElement("td");
+                var locationName = document.createTextNode(person.locationName || 'N/A');
+                location.append(locationName);
+                
+                row.append(location);
+    
+                var jobTitle = document.createElement("td");
+                var jobTitleName = document.createTextNode(person.jobTitle || 'N/A');
+                jobTitle.append(jobTitleName);
+                
+                row.append(jobTitle);  
+                
+                var email = document.createElement("td");
+                var emailName = document.createTextNode(person.email || 'N/A');
+                email.append(emailName);
+                
+                row.append(email);     
+                
+                // Create the Modify button
+                var editButton = document.createElement("button");
+                editButton.className = "btn btn-primary btn-sm editBtn";
+                editButton.setAttribute("data-bs-toggle", "modal");
+                editButton.setAttribute("data-bs-target", "#editPersonnelModal");
+                editButton.setAttribute("data-id", person.id);
+    
+                // Add the Font Awesome icon inside the button
+                var editIcon = document.createElement("i");
+                editIcon.className = "fa-solid fa-pencil fa-fw";
+                editButton.append(editIcon);
+    
+                // Create the Delete button
+                var deleteButton = document.createElement("button");
+                deleteButton.className = "btn btn-primary btn-sm";
+                deleteButton.setAttribute("data-bs-toggle", "modal");
+                deleteButton.setAttribute("data-bs-target", "#deletePersonnelModal");
+                deleteButton.setAttribute("data-id", person.id);
+    
+                // Add the Font Awesome icon inside the button
+                var deleteIcon = document.createElement("i");
+                deleteIcon.className = "fa-solid fa-trash fa-fw";
+                deleteButton.append(deleteIcon);
+    
+                // Create a table cell to hold the buttons  
+                var buttonCell = document.createElement("td");
+                buttonCell.className = "actions-cell";
+                buttonCell.append(editButton);
+                buttonCell.append(deleteButton);
+    
+                // Append the cell to the row
+                row.append(buttonCell); 
+    
+                frag.append(row);
+              });                
+            
+              $('#personnelTableBody').append(frag);
+            } else {
+              var row = document.createElement("tr");
 
-                  //column for Name/Department/Location/JobTitle/Email/Buttons
-                  const $Name = $('<td class="align-middle text-nowrap"></td>').text(`${person.lastName}, ${person.firstName}`);
-                  const $Department = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.departmentName}`);
-                  const $Location = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.locationName}`);
-                  const $JobTitle = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.jobTitle}`);
-                  const $Email = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.email}`);
-                  const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
-
-                  //Modify Button
-                  const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="' + person.id + '"></button>');
-                  $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
-
-                  //Delete Button
-                  const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="' + person.id + '"></button>');
-                  $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
-
-                  //Append the buttons to the button cell
-                  $buttonCell.append($editButton).append($deleteButton);
-
-                  //Append the columns to the row
-                  $tr.append($Name).append($Department).append($Location).append($JobTitle).append($Email).append($buttonCell);
-
-                  //Append the row to the table body
-                  $personnelTableBody.append($tr);
-                })
-              } else {
-                $personnelTableBody.append('<tr><td colspan="6" class="text-center">No results found.</td></tr>');
-              }
+              var noResult = document.createElement("td");
+              noResult.className = "text-center";
+              var noResultText = document.createTextNode('No results found.');
+              noResult.append(noResultText);
+                
+              row.append(noResult);
+              frag.append(row);
+              $('#personnelTableBody').append(frag);
             }
-          },
-          error: function(xhr, status, error) {
-            console.error('Error loading data: ', error);
-            console.log("Response:", xhr.responseText);
           }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading data: ', error);
+          console.log("Response:", xhr.responseText);
+        }
         })
         //end of activeTab = personnel Tab
 
@@ -79,37 +139,83 @@ $(document).ready(function() {
               const $departmentTableBody = $('#departmentTableBody');
               $departmentTableBody.empty(); //clear the table before displaying new results
 
+              var frag = document.createDocumentFragment();
+
               if (resultsArray.length > 0) {
+                console.log(resultsArray);
+
                 $.each(result.data.found, function(index, department) {
-                  //create a new row and its columns
-                  const $tr = $('<tr></tr>');
+                  var row = document.createElement("tr");
+                       
+                  var id = document.createElement("td");
+                  id.classList.add("hidden-id");
+                  id.setAttribute("data-id", department.departmentID);
+                  id.textContent = department.departmentID;
+                  row.appendChild(id);
+            
+                  var name = document.createElement("td");
+                  name.classList.add("name-cell");
+                  var nameText = document.createTextNode(department.departmentName);
+                  name.append(nameText);
+            
+                  row.append(name);
 
-                  //column for Name/Department/Location/JobTitle/Email/Buttons
-                  const $Name = $('<td class="align-middle text-nowrap"></td>').text(`${department.departmentName}`);
-                  const $Location = $('<td class="align-middle text-nowrap"></td>').text(`${department.locationName}`);
-                  const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
+                  var location = document.createElement("td");
+                  var locationName = document.createTextNode(department.locationName || 'N/A');
+                  location.append(locationName);
+            
+                  row.append(location);  
+            
+                  // Create the Modify button
+                  var editButton = document.createElement("button");
+                  editButton.className = "btn btn-primary btn-sm editBtn";
+                  editButton.setAttribute("data-bs-toggle", "modal");
+                  editButton.setAttribute("data-bs-target", "#editDepartmentModal");
+                  editButton.setAttribute("data-id", department.id);
 
-                  //Modify Button
-                  const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" data-id="' + department.departmentID + '"></button>');
-                  $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
+                  // Add the Font Awesome icon inside the button
+                  var editIcon = document.createElement("i");
+                  editIcon.className = "fa-solid fa-pencil fa-fw";
+                  editButton.append(editIcon);
 
-                  //Delete Button
-                  const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deleteDepartmentModal" data-id="' + department.departmentID + '"></button>');
-                  $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
+                  // Create the Delete button
+                  var deleteButton = document.createElement("button");
+                  deleteButton.className = "btn btn-primary btn-sm";
+                  deleteButton.setAttribute("data-bs-toggle", "modal");
+                  deleteButton.setAttribute("data-bs-target", "#deleteDepartmentModal");
+                  deleteButton.setAttribute("data-id", department.id);
 
-                  //Append the buttons to the button cell
-                  $buttonCell.append($editButton).append($deleteButton);
+                  // Add the Font Awesome icon inside the button
+                  var deleteIcon = document.createElement("i");
+                  deleteIcon.className = "fa-solid fa-trash fa-fw";
+                  deleteButton.append(deleteIcon);
 
-                  //Append the columns to the row
-                  $tr.append($Name).append($Location).append($buttonCell);
+                  // Create a table cell to hold the buttons  
+                  var buttonCell = document.createElement("td");
+                  buttonCell.className = "actions-cell";
+                  buttonCell.append(editButton);
+                  buttonCell.append(deleteButton);
 
-                  //Append the row to the table body
-                  $departmentTableBody.append($tr);
+                  // Append the cell to the row
+                  row.append(buttonCell); 
+
+                  frag.append(row);
                 })
-              } else {
-                $departmentTableBody.append('<tr><td colspan="6" class="text-center">No results found.</td></tr>');
+                  
+                  $('#departmentTableBody').append(frag);
+                } else {
+                  var row = document.createElement("tr");
+
+                  var noResult = document.createElement("td");
+                  noResult.className = "text-center";
+                  var noResultText = document.createTextNode('No results found.');
+                  noResult.append(noResultText);
+                
+                  row.append(noResult);
+                  frag.append(row);
+                  $('#departmentTableBody').append(frag);
+                }
               }
-            }
           },
           error: function(xhr, status, error) {
             console.error('Error loading data: ', error);
@@ -132,32 +238,63 @@ $(document).ready(function() {
               const $locationTableBody = $('#locationTableBody');
               $locationTableBody.empty(); //clear the table before displaying new results
 
+              var frag = document.createDocumentFragment();
+
               if (resultsArray.length > 0) {
                 $.each(result.data.found, function(index, location) {
-                  //create a new row and its columns
-                  const $tr = $('<tr></tr>');
-
-                  //column for Name/Department/Location/JobTitle/Email/Buttons
-                  const $Location = $('<td class="align-middle text-nowrap"></td>').text(`${location.name}`);
-                  const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
-
-                  //Modify Button
-                  const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editLocationModal" data-id="' + location.id + '"></button>');
-                  $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
-
-                  //Delete Button
-                  const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deleteLocationModal" data-id="' + location.id + '"></button>');
-                  $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
-
-                  //Append the buttons to the button cell
-                  $buttonCell.append($editButton).append($deleteButton);
-
-                  //Append the columns to the row
-                  $tr.append($Location).append($buttonCell);
-
-                  //Append the row to the table body
-                  $locationTableBody.append($tr);
+                  var row = document.createElement("tr");
+                       
+                  var id = document.createElement("td");
+                  id.classList.add("hidden-id");
+                  id.setAttribute("data-id", location.id);
+                  id.textContent = location.id;
+                  row.appendChild(id);
+                  
+                  var name = document.createElement("td");
+                  name.classList.add("name-cell");
+                  var nameText = document.createTextNode(location.name);
+                  name.append(nameText);
+                  
+                  row.append(name);
+      
+                  // Create the Modify button
+                  var editButton = document.createElement("button");
+                  editButton.className = "btn btn-primary btn-sm editBtn";
+                  editButton.setAttribute("data-bs-toggle", "modal");
+                  editButton.setAttribute("data-bs-target", "#editLocationModal");
+                  editButton.setAttribute("data-id", location.id);
+      
+                  // Add the Font Awesome icon inside the button
+                  var editIcon = document.createElement("i");
+                  editIcon.className = "fa-solid fa-pencil fa-fw";
+                  editButton.append(editIcon);
+      
+                  // Create the Delete button
+                  var deleteButton = document.createElement("button");
+                  deleteButton.className = "btn btn-primary btn-sm";
+                  deleteButton.setAttribute("data-bs-toggle", "modal");
+                  deleteButton.setAttribute("data-bs-target", "#deleteLocationModal");
+                  deleteButton.setAttribute("data-id", location.id);
+      
+                  // Add the Font Awesome icon inside the button
+                  var deleteIcon = document.createElement("i");
+                  deleteIcon.className = "fa-solid fa-trash fa-fw";
+                  deleteButton.append(deleteIcon);
+      
+                  // Create a table cell to hold the buttons  
+                  var buttonCell = document.createElement("td");
+                  buttonCell.className = "actions-cell";
+                  buttonCell.append(editButton);
+                  buttonCell.append(deleteButton);
+      
+                  // Append the cell to the row
+                  row.append(buttonCell); 
+      
+                  frag.append(row);
                 })
+
+                $('#locationTableBody').append(frag);
+
               } else {
                 $locationTableBody.append('<tr><td colspan="6" class="text-center">No results found.</td></tr>');
               }
@@ -179,39 +316,87 @@ $(document).ready(function() {
           dataType: 'json',
           success: function (result) {
             if (result.status.code === '200')  {
-              const $personnelTableBody = $('#personnelTableBody');
+              const personnelData = result.data;
+              var frag = document.createDocumentFragment();
+             
+              personnelData.forEach(person => {
+                var row = document.createElement("tr");
+                           
+                var id = document.createElement("td");
+                id.classList.add("hidden-id");
+                id.setAttribute("data-id", person.id);
+                id.textContent = person.id;
+                row.appendChild(id);
+                
+                var name = document.createElement("td");
+                name.classList.add("name-cell");
+                var nameText = document.createTextNode(`${person.lastName}, ${person.firstName}`);
+                name.append(nameText);
+                
+                row.append(name);
+    
+                var department = document.createElement("td");
+                var departmentName = document.createTextNode(person.department || 'N/A');
+                department.append(departmentName);
+                
+                row.append(department);
+    
+                var location = document.createElement("td");
+                var locationName = document.createTextNode(person.location || 'N/A');
+                location.append(locationName);
+                
+                row.append(location);
+    
+                var jobTitle = document.createElement("td");
+                var jobTitleName = document.createTextNode(person.jobTitle || 'N/A');
+                jobTitle.append(jobTitleName);
+                
+                row.append(jobTitle);  
+                
+                var email = document.createElement("td");
+                var emailName = document.createTextNode(person.email || 'N/A');
+                email.append(emailName);
+                
+                row.append(email);     
+                
+                // Create the Modify button
+                var editButton = document.createElement("button");
+                editButton.className = "btn btn-primary btn-sm editBtn";
+                editButton.setAttribute("data-bs-toggle", "modal");
+                editButton.setAttribute("data-bs-target", "#editPersonnelModal");
+                editButton.setAttribute("data-id", person.id);
+    
+                // Add the Font Awesome icon inside the button
+                var editIcon = document.createElement("i");
+                editIcon.className = "fa-solid fa-pencil fa-fw";
+                editButton.append(editIcon);
+    
+                // Create the Delete button
+                var deleteButton = document.createElement("button");
+                deleteButton.className = "btn btn-primary btn-sm";
+                deleteButton.setAttribute("data-bs-toggle", "modal");
+                deleteButton.setAttribute("data-bs-target", "#deletePersonnelModal");
+                deleteButton.setAttribute("data-id", person.id);
+    
+                // Add the Font Awesome icon inside the button
+                var deleteIcon = document.createElement("i");
+                deleteIcon.className = "fa-solid fa-trash fa-fw";
+                deleteButton.append(deleteIcon);
+    
+                // Create a table cell to hold the buttons  
+                var buttonCell = document.createElement("td");
+                buttonCell.className = "actions-cell";
+                buttonCell.append(editButton);
+                buttonCell.append(deleteButton);
+    
+                // Append the cell to the row
+                row.append(buttonCell); 
+    
+                frag.append(row);
+    
+              });                
             
-              $personnelTableBody.empty(); //clear the table before displaying new results
-
-              $.each(result.data, function(index, person) {
-                //create a new row and its columns
-                const $tr = $('<tr></tr>');
-      
-                //column for Name/Department/Location/JobTitle/Email/Buttons
-                const $Name = $('<td class="align-middle text-nowrap"></td>').text(`${person.lastName}, ${person.firstName}`);
-                const $Department = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.department}`);
-                const $Location = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.location}`);
-                const $JobTitle = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.jobTitle}`);
-                const $Email = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.email}`);
-                const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
-      
-                //Modify Button
-                const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="' + person.id + '"></button>');
-                $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
-      
-                //Delete Button
-                const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="' + person.id + '"></button>');
-                $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
-      
-                //Append the buttons to the button cell
-                $buttonCell.append($editButton).append($deleteButton);
-      
-                //Append the columns to the row
-                $tr.append($Name).append($Department).append($Location).append($JobTitle).append($Email).append($buttonCell);
-      
-                //Append the row to the table body
-                $personnelTableBody.append($tr);
-              })
+              $('#personnelTableBody').append(frag);
             }
           },
           error: function(xhr, status, error) {
@@ -228,36 +413,69 @@ $(document).ready(function() {
           success: function (result) {
     
             if (result.status.code === '200')  {
-              const $departmentTableBody = $('#departmentTableBody');
+                const departmentData = result.data;
+                var frag = document.createDocumentFragment();
+             
+                departmentData.forEach(department => {
+                var row = document.createElement("tr");
+                           
+                var id = document.createElement("td");
+                id.classList.add("hidden-id");
+                id.setAttribute("data-id", department.id);
+                id.textContent = department.id;
+                row.appendChild(id);
+                
+                var name = document.createElement("td");
+                name.classList.add("name-cell");
+                var nameText = document.createTextNode(department.department);
+                name.append(nameText);
+                
+                row.append(name);
+    
+                var location = document.createElement("td");
+                var locationName = document.createTextNode(department.location || 'N/A');
+                location.append(locationName);
+                
+                row.append(location);  
+                
+                // Create the Modify button
+                var editButton = document.createElement("button");
+                editButton.className = "btn btn-primary btn-sm editBtn";
+                editButton.setAttribute("data-bs-toggle", "modal");
+                editButton.setAttribute("data-bs-target", "#editDepartmentModal");
+                editButton.setAttribute("data-id", department.id);
+    
+                // Add the Font Awesome icon inside the button
+                var editIcon = document.createElement("i");
+                editIcon.className = "fa-solid fa-pencil fa-fw";
+                editButton.append(editIcon);
+    
+                // Create the Delete button
+                var deleteButton = document.createElement("button");
+                deleteButton.className = "btn btn-primary btn-sm";
+                deleteButton.setAttribute("data-bs-toggle", "modal");
+                deleteButton.setAttribute("data-bs-target", "#deleteDepartmentModal");
+                deleteButton.setAttribute("data-id", department.id);
+    
+                // Add the Font Awesome icon inside the button
+                var deleteIcon = document.createElement("i");
+                deleteIcon.className = "fa-solid fa-trash fa-fw";
+                deleteButton.append(deleteIcon);
+    
+                // Create a table cell to hold the buttons  
+                var buttonCell = document.createElement("td");
+                buttonCell.className = "actions-cell";
+                buttonCell.append(editButton);
+                buttonCell.append(deleteButton);
+    
+                // Append the cell to the row
+                row.append(buttonCell); 
+    
+                frag.append(row);
+    
+              });                
             
-              $departmentTableBody.empty(); //clear the table before displaying new results
-
-              $.each(result.data, function(index, department) {
-                //create a new row and its columns
-                const $tr = $('<tr></tr>');
-    
-                //column for Name/Location/Buttons
-                const $Name = $('<td class="align-middle text-nowrap"></td>').text(`${department.department}`);
-                const $Location = $('<td class="align-middle text-nowrap"></td>').text(`${department.location}`);
-                const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
-    
-                //Modify Button
-                const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" data-id="' + department.id + '"></button>');
-                $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
-    
-                //Delete Button
-                const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deleteDepartmentModal" data-id="' + department.id + '"></button>');
-                $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
-    
-                //Append the buttons to the button cell
-                $buttonCell.append($editButton).append($deleteButton);
-    
-                //Append the columns to the row
-                $tr.append($Name).append($Location).append($buttonCell);
-    
-                //Append the row to the table body
-                $departmentTableBody.append($tr);
-              })
+              $('#departmentTableBody').append(frag);
             }
           },
           error: function(xhr, status, error) {
@@ -272,44 +490,71 @@ $(document).ready(function() {
           type: 'GET',
           dataType: 'json',
           success: function (result) {
-    
+  
             if (result.status.code === '200')  {
-              const $locationTableBody = $('#locationTableBody');
-            
-              $locationTableBody.empty(); //clear the table before displaying new results
-
-              $.each(result.data, function(index, location) {
-                //create a new row and its columns
-                const $tr = $('<tr></tr>');
-    
-                //column for Name/Department/Location/JobTitle/Email/Buttons
-                const $Location = $('<td class="align-middle text-nowrap"></td>').text(`${location.location}`);
-                const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
-    
-                //Modify Button
-                const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editLocationModal" data-id="' + location.id + '"></button>');
-                $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
-    
-                //Delete Button
-                const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deleteLocationModal" data-id="' + location.id + '"></button>');
-                $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
-    
-                //Append the buttons to the button cell
-                $buttonCell.append($editButton).append($deleteButton);
-    
-                //Append the columns to the row
-                $tr.append($Location).append($buttonCell);
-    
-                //Append the row to the table body
-                $locationTableBody.append($tr);
-              })
-            }
-          },
-          error: function(xhr, status, error) {
-            console.error('Error loading data: ', error);
-            console.log("Response:", xhr.responseText);
+              const locationData = result.data;
+              var frag = document.createDocumentFragment();
+           
+              locationData.forEach(location => {
+  
+              var row = document.createElement("tr");
+                         
+              var id = document.createElement("td");
+              id.classList.add("hidden-id");
+              id.setAttribute("data-id", location.id);
+              id.textContent = location.id;
+              row.appendChild(id);
+              
+              var name = document.createElement("td");
+              name.classList.add("name-cell");
+              var nameText = document.createTextNode(location.location);
+              name.append(nameText);
+              
+              row.append(name);
+  
+              // Create the Modify button
+              var editButton = document.createElement("button");
+              editButton.className = "btn btn-primary btn-sm editBtn";
+              editButton.setAttribute("data-bs-toggle", "modal");
+              editButton.setAttribute("data-bs-target", "#editLocationModal");
+              editButton.setAttribute("data-id", location.id);
+  
+              // Add the Font Awesome icon inside the button
+              var editIcon = document.createElement("i");
+              editIcon.className = "fa-solid fa-pencil fa-fw";
+              editButton.append(editIcon);
+  
+              // Create the Delete button
+              var deleteButton = document.createElement("button");
+              deleteButton.className = "btn btn-primary btn-sm";
+              deleteButton.setAttribute("data-bs-toggle", "modal");
+              deleteButton.setAttribute("data-bs-target", "#deleteLocationModal");
+              deleteButton.setAttribute("data-id", location.id);
+  
+              // Add the Font Awesome icon inside the button
+              var deleteIcon = document.createElement("i");
+              deleteIcon.className = "fa-solid fa-trash fa-fw";
+              deleteButton.append(deleteIcon);
+  
+              // Create a table cell to hold the buttons  
+              var buttonCell = document.createElement("td");
+              buttonCell.className = "actions-cell";
+              buttonCell.append(editButton);
+              buttonCell.append(deleteButton);
+  
+              // Append the cell to the row
+              row.append(buttonCell); 
+  
+              frag.append(row);
+            });                
+            $('#locationTableBody').append(frag);
           }
-        })
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading data: ', error);
+          console.log("Response:", xhr.responseText);
+        }
+      })
       }
     }
   });
@@ -703,43 +948,10 @@ $(document).ready(function() {
       dataType: 'json',
       success: function (result) {
         if (result.status.code === '200')  {
-        //const $personnelTableBody = $('#personnelTableBody');
-
-        /*$.each(result.data, function(index, person) {
-          //create a new row and its columns
-          const $tr = $('<tr></tr>');
-
-          //column for Name/Department/Location/JobTitle/Email/Buttons
-          const $Name = $('<td class="align-middle text-nowrap"></td>').text(`${person.lastName}, ${person.firstName}`);
-          const $Department = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.department}`);
-          const $Location = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.location}`);
-          const $JobTitle = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.jobTitle}`);
-          const $Email = $('<td class="align-middle text-nowrap d-none d-md-table-cell"></td>').text(`${person.email}`);
-          const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
-
-          //Modify Button
-          const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="' + person.id + '"></button>');
-          $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
-
-          //Delete Button
-          const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deletePersonnelModal" data-id="' + person.id + '"></button>');
-          $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
-
-          //Append the buttons to the button cell
-          $buttonCell.append($editButton).append($deleteButton);
-
-          //Append the columns to the row
-          $tr.append($Name).append($Department).append($Location).append($JobTitle).append($Email).append($buttonCell);
-
-          //Append the row to the table body
-          $personnelTableBody.append($tr);*/
-
           const personnelData = result.data;
           var frag = document.createDocumentFragment();
          
           personnelData.forEach(person => {
-            console.log('Raw data for the second fetch', result);
-
             var row = document.createElement("tr");
                        
             var id = document.createElement("td");
@@ -841,8 +1053,6 @@ $(document).ready(function() {
             var frag = document.createDocumentFragment();
          
             departmentData.forEach(department => {
-            console.log('Raw data for the department', result);
-
             var row = document.createElement("tr");
                        
             var id = document.createElement("td");
@@ -925,7 +1135,6 @@ $(document).ready(function() {
             var frag = document.createDocumentFragment();
          
             locationData.forEach(location => {
-            console.log('Raw data for the location', result);
 
             var row = document.createElement("tr");
                        
