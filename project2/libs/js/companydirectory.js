@@ -837,34 +837,71 @@ $(document).ready(function() {
       success: function (result) {
 
         if (result.status.code === '200')  {
-          const $departmentTableBody = $('#departmentTableBody');
+            const departmentData = result.data;
+            var frag = document.createDocumentFragment();
+         
+            departmentData.forEach(department => {
+            console.log('Raw data for the department', result);
 
-          $.each(result.data, function(index, department) {
-            //create a new row and its columns
-            const $tr = $('<tr></tr>');
+            var row = document.createElement("tr");
+                       
+            var id = document.createElement("td");
+            id.classList.add("hidden-id");
+            id.setAttribute("data-id", department.id);
+            id.textContent = department.id;
+            row.appendChild(id);
+            
+            var name = document.createElement("td");
+            name.classList.add("name-cell");
+            var nameText = document.createTextNode(department.department);
+            name.append(nameText);
+            
+            row.append(name);
 
-            //column for Name/Department/Location/JobTitle/Email/Buttons
-            const $Name = $('<td class="align-middle text-nowrap"></td>').text(`${department.department}`);
-            const $Location = $('<td class="align-middle text-nowrap"></td>').text(`${department.location}`);
-            const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
+            var location = document.createElement("td");
+            var locationName = document.createTextNode(department.location || 'N/A');
+            location.append(locationName);
+            
+            row.append(location);  
+            
+            // Create the Modify button
+            var editButton = document.createElement("button");
+            editButton.className = "btn btn-primary btn-sm editBtn";
+            editButton.setAttribute("data-bs-toggle", "modal");
+            editButton.setAttribute("data-bs-target", "#editDepartmentModal");
+            editButton.setAttribute("data-id", department.id);
 
-            //Modify Button
-            const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" data-id="' + department.id + '"></button>');
-            $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
+            // Add the Font Awesome icon inside the button
+            var editIcon = document.createElement("i");
+            editIcon.className = "fa-solid fa-pencil fa-fw";
+            editButton.append(editIcon);
 
-            //Delete Button
-            const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deleteDepartmentModal" data-id="' + department.id + '"></button>');
-            $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
+            // Create the Delete button
+            var deleteButton = document.createElement("button");
+            deleteButton.className = "btn btn-primary btn-sm";
+            deleteButton.setAttribute("data-bs-toggle", "modal");
+            deleteButton.setAttribute("data-bs-target", "#deleteDepartmentModal");
+            deleteButton.setAttribute("data-id", department.id);
 
-            //Append the buttons to the button cell
-            $buttonCell.append($editButton).append($deleteButton);
+            // Add the Font Awesome icon inside the button
+            var deleteIcon = document.createElement("i");
+            deleteIcon.className = "fa-solid fa-trash fa-fw";
+            deleteButton.append(deleteIcon);
 
-            //Append the columns to the row
-            $tr.append($Name).append($Location).append($buttonCell);
+            // Create a table cell to hold the buttons  
+            var buttonCell = document.createElement("td");
+            buttonCell.className = "actions-cell";
+            buttonCell.append(editButton);
+            buttonCell.append(deleteButton);
 
-            //Append the row to the table body
-            $departmentTableBody.append($tr);
-          })
+            // Append the cell to the row
+            row.append(buttonCell); 
+
+            frag.append(row);
+
+          });                
+        
+          $('#departmentTableBody').append(frag);
         }
       },
       error: function(xhr, status, error) {
@@ -884,33 +921,63 @@ $(document).ready(function() {
         success: function (result) {
 
           if (result.status.code === '200')  {
-            const $locationTableBody = $('#locationTableBody');
+            const locationData = result.data;
+            var frag = document.createDocumentFragment();
+         
+            locationData.forEach(location => {
+            console.log('Raw data for the location', result);
 
-            $.each(result.data, function(index, location) {
-            //create a new row and its columns
-            const $tr = $('<tr></tr>');
+            var row = document.createElement("tr");
+                       
+            var id = document.createElement("td");
+            id.classList.add("hidden-id");
+            id.setAttribute("data-id", location.id);
+            id.textContent = location.id;
+            row.appendChild(id);
+            
+            var name = document.createElement("td");
+            name.classList.add("name-cell");
+            var nameText = document.createTextNode(location.location);
+            name.append(nameText);
+            
+            row.append(name);
 
-            //column for Name/Department/Location/JobTitle/Email/Buttons
-            const $Location = $('<td class="align-middle text-nowrap"></td>').text(`${location.location}`);
-            const $buttonCell = $('<td class="text-end d-md-table-cell"></td>');
+            // Create the Modify button
+            var editButton = document.createElement("button");
+            editButton.className = "btn btn-primary btn-sm editBtn";
+            editButton.setAttribute("data-bs-toggle", "modal");
+            editButton.setAttribute("data-bs-target", "#editLocationModal");
+            editButton.setAttribute("data-id", location.id);
 
-            //Modify Button
-            const $editButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editLocationModal" data-id="' + location.id + '"></button>');
-            $editButton.append('<i class="fa-solid fa-pencil fa-fw"></i>');
+            // Add the Font Awesome icon inside the button
+            var editIcon = document.createElement("i");
+            editIcon.className = "fa-solid fa-pencil fa-fw";
+            editButton.append(editIcon);
 
-            //Delete Button
-            const $deleteButton = $('<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deleteLocationModal" data-id="' + location.id + '"></button>');
-            $deleteButton.append('<i class="fa-solid fa-trash fa-fw"></i>');
+            // Create the Delete button
+            var deleteButton = document.createElement("button");
+            deleteButton.className = "btn btn-primary btn-sm";
+            deleteButton.setAttribute("data-bs-toggle", "modal");
+            deleteButton.setAttribute("data-bs-target", "#deleteLocationModal");
+            deleteButton.setAttribute("data-id", location.id);
 
-            //Append the buttons to the button cell
-            $buttonCell.append($editButton).append($deleteButton);
+            // Add the Font Awesome icon inside the button
+            var deleteIcon = document.createElement("i");
+            deleteIcon.className = "fa-solid fa-trash fa-fw";
+            deleteButton.append(deleteIcon);
 
-            //Append the columns to the row
-            $tr.append($Location).append($buttonCell);
+            // Create a table cell to hold the buttons  
+            var buttonCell = document.createElement("td");
+            buttonCell.className = "actions-cell";
+            buttonCell.append(editButton);
+            buttonCell.append(deleteButton);
 
-            //Append the row to the table body
-            $locationTableBody.append($tr);
-          })
+            // Append the cell to the row
+            row.append(buttonCell); 
+
+            frag.append(row);
+          });                
+          $('#locationTableBody').append(frag);
         }
       },
       error: function(xhr, status, error) {
