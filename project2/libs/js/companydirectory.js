@@ -2,6 +2,38 @@ $(window).on('load', function() {
   $('#preloader').fadeOut('slow'); // Use fadeOut for smooth transition
 });
 
+//Check if department has employees and show modal
+function checkDepartmentBeforeDelete(departmentId, departmentName) {
+  console.log("Department ID:", departmentId);
+  console.log("Department Name: ", departmentName);
+
+  $.ajax({
+    url: "http://localhost:8080/itcareerswitch/project2/libs/php/COUNT/countPersonnel.php",
+    type: 'GET',
+    dataType: 'json',
+    data: {
+      id: departmentId,
+    },
+    success: function (result) {
+      console.log(result);
+
+        if (result.data.department.employee_count.employee_count > 0) {
+          $('#cantDeleteDeptName').text(departmentName);
+          $('#personnelCount').text(result.data.department.employee_count.employee_count);
+          $('#cantDeleteDepartmentModal').modal('show');
+        } else {
+          $('#areYouSureDeptName').text(departmentName); // Set department name dynamically
+          $('#deleteDepartmentID').val(departmentId); // Set department ID for deletion
+          $('#areYouSureDeleteDepartmentModal').modal('show');
+        }
+    },
+    error: function(xhr, status, error) {
+      console.error("Ajax Error: ", status, error);
+      console.log("Full Response: ", xhr.responseText);
+    }
+  })
+}
+
 $(document).ready(function() {
   /*SEARCH BAR FOR PERSONNEL*/
   $("#searchInp").on("keyup", function () {
@@ -83,7 +115,7 @@ $(document).ready(function() {
                 var deleteButton = document.createElement("button");
                 deleteButton.className = "btn btn-primary btn-sm";
                 deleteButton.setAttribute("data-bs-toggle", "modal");
-                deleteButton.setAttribute("data-bs-target", "#deletePersonnelModal");
+                deleteButton.setAttribute("data-bs-target", "#areYouSurePersonnelModal");
                 deleteButton.setAttribute("data-id", person.id);
     
                 // Add the Font Awesome icon inside the button
@@ -384,7 +416,7 @@ $(document).ready(function() {
                 var deleteButton = document.createElement("button");
                 deleteButton.className = "btn btn-primary btn-sm";
                 deleteButton.setAttribute("data-bs-toggle", "modal");
-                deleteButton.setAttribute("data-bs-target", "#deletePersonnelModal");
+                deleteButton.setAttribute("data-bs-target", "#areYouSurePersonnelModal");
                 deleteButton.setAttribute("data-id", person.id);
     
                 // Add the Font Awesome icon inside the button
@@ -641,7 +673,7 @@ $(document).ready(function() {
               var deleteButton = document.createElement("button");
               deleteButton.className = "btn btn-primary btn-sm";
               deleteButton.setAttribute("data-bs-toggle", "modal");
-              deleteButton.setAttribute("data-bs-target", "#deletePersonnelModal");
+              deleteButton.setAttribute("data-bs-target", "#areYouSurePersonnelModal");
               deleteButton.setAttribute("data-id", person.id);
   
               // Add the Font Awesome icon inside the button
@@ -1102,7 +1134,7 @@ $(document).ready(function() {
               var deleteButton = document.createElement("button");
               deleteButton.className = "btn btn-primary btn-sm";
               deleteButton.setAttribute("data-bs-toggle", "modal");
-              deleteButton.setAttribute("data-bs-target", "#deletePersonnelModal");
+              deleteButton.setAttribute("data-bs-target", "#areYouSurePersonnelModal");
               deleteButton.setAttribute("data-id", person.id);
 
               // Add the Font Awesome icon inside the button
@@ -1220,7 +1252,7 @@ $(document).ready(function() {
             var deleteButton = document.createElement("button");
             deleteButton.className = "btn btn-primary btn-sm";
             deleteButton.setAttribute("data-bs-toggle", "modal");
-            deleteButton.setAttribute("data-bs-target", "#deletePersonnelModal");
+            deleteButton.setAttribute("data-bs-target", "#areYouSurePersonnelModal");
             deleteButton.setAttribute("data-id", person.id);
 
             // Add the Font Awesome icon inside the button
@@ -1252,6 +1284,8 @@ $(document).ready(function() {
   }
 
   displayPersonnel();
+
+  
 
   /*DISPLAY DEPARTMENT DATA*/
   function displayDepartment() {
@@ -1299,12 +1333,18 @@ $(document).ready(function() {
             editIcon.className = "fa-solid fa-pencil fa-fw";
             editButton.append(editIcon);
 
-            // Create the Delete button
+            /*Create the Delete button
             var deleteButton = document.createElement("button");
             deleteButton.className = "btn btn-primary btn-sm";
             deleteButton.setAttribute("data-bs-toggle", "modal");
             deleteButton.setAttribute("data-bs-target", "#deleteDepartmentModal");
+            deleteButton.setAttribute("data-id", department.id);*/
+
+            // Create the Delete button
+            var deleteButton = document.createElement("button");
+            deleteButton.className = "btn btn-primary btn-sm";
             deleteButton.setAttribute("data-id", department.id);
+            deleteButton.setAttribute("onclick", `checkDepartmentBeforeDelete(${department.id}, '${department.department}')`);
 
             // Add the Font Awesome icon inside the button
             var deleteIcon = document.createElement("i");
@@ -1334,6 +1374,7 @@ $(document).ready(function() {
     })
   }
   //displayDepartment();
+
 
     /*DISPLAY LOCATION DATA*/
     function displayLocation() {
@@ -1465,7 +1506,6 @@ $(document).ready(function() {
       },
       success: function(result) {
         if (result.status.code === '200') {
-          alert('Employee added successfully.');
 
           //Reset the form inputs
           $('#addPersonnelFirstName').val('');
@@ -1537,7 +1577,6 @@ $(document).ready(function() {
       },
       success: function(result) {
         if (result.status.code === '200') {
-          alert('Department added successfully.');
 
           //Reset the form inputs
           $('#addDepartmentName').val('');
@@ -1561,8 +1600,6 @@ $(document).ready(function() {
 
     const newLocation = $('#addLocationName').val();
 
-    console.log('Location: ', newLocation);
-
     if (newLocation) {
     $.ajax({
       url: 'http://localhost:8080/itcareerswitch/project2/libs/php/INSERT/insertLocations.php',
@@ -1578,8 +1615,6 @@ $(document).ready(function() {
 
           //Close Modal
           $('#addLocationModal').modal("hide");
-
-          alert('Location added successfully.');
         }
       },
       error: function(xhr, status, error) {
@@ -1830,7 +1865,7 @@ $(document).ready(function() {
   });
 
   /*DELETE PERSONNEL*/
-  $("#deletePersonnelModal").on("show.bs.modal", function (e) {
+  $("#areYouSurePersonnelModal").on("show.bs.modal", function (e) {
     $.ajax({
       url:"http://localhost:8080/itcareerswitch/project2/libs/php/GET/getPersonnelByID.php",
       type: "POST",
@@ -1848,17 +1883,17 @@ $(document).ready(function() {
           
           // Update the hidden input with the employee id so that
           // it can be referenced when the form is submitted
-          $("#deletePersonnelID").val(result.data.personnel[0].id);
-          $("#deleteName").html("<p><strong>" + result.data.personnel[0].lastName + ", " + result.data.personnel[0].firstName + "</strong></p>");
+          $("#areYouSurePersonnelID").val(result.data.personnel[0].id);
+          $("#areYouSurePersonnelName").html("<p><strong>" + result.data.personnel[0].lastName + ", " + result.data.personnel[0].firstName + "</strong></p>");
 
         } else {
-          $("#deletePersonnelModal .modal-title").replaceWith(
+          $("#areYouSurePersonnelModal .modal-title").replaceWith(
             "Error retrieving data"
           );
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        $("#deletePersonnelModal .modal-title").replaceWith(
+        $("#areYouSurePersonnelModal .modal-title").replaceWith(
           "Error retrieving data"
         );
       }
@@ -1866,10 +1901,10 @@ $(document).ready(function() {
   })
 
   // Executes when the form button with type="submit" is clicked
-  $("#deletePersonnelForm").on("submit", function (event) {
+  $("#areYouSurePersonnelForm").on("submit", function (event) {
     event.preventDefault(); // Prevent the form submission (page reload)
 
-    const id = $('#deletePersonnelID').val();
+    const id = $('#areYouSurePersonnelID').val();
 
     $.ajax({
       url: 'http://localhost:8080/itcareerswitch/project2/libs/php/DELETE/deletePersonnelByID.php',
@@ -1881,7 +1916,7 @@ $(document).ready(function() {
       success: function(result) {
         if (result.status.code === '200') {
           //Close Modal
-          $('#deletePersonnelModal').modal("hide");
+          $('#areYouSurePersonnelModal').modal("hide");
         }
       },
       error: function(xhr, status, error) {
