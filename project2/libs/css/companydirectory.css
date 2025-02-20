@@ -82,3 +82,18 @@ table {
 .editBtn {
   margin-right: 10px;
 }
+
+@media (max-width: 768px) {
+  .department-cell {
+    display: none;
+  } 
+  .location-cell {
+    display: none;
+  }
+  .job-title-cell {
+    display: none;
+  } 
+  .email-cell {
+      display: none;
+  }
+}

@@ -43,24 +43,28 @@ $(document).ready(function() {
                 row.append(name);
     
                 var department = document.createElement("td");
+                department.classList.add("department-cell");
                 var departmentName = document.createTextNode(person.departmentName || 'N/A');
                 department.append(departmentName);
                 
                 row.append(department);
     
                 var location = document.createElement("td");
+                location.classList.add("location-cell");
                 var locationName = document.createTextNode(person.locationName || 'N/A');
                 location.append(locationName);
                 
                 row.append(location);
     
                 var jobTitle = document.createElement("td");
+                jobTitle.classList.add("job-title-cell");
                 var jobTitleName = document.createTextNode(person.jobTitle || 'N/A');
                 jobTitle.append(jobTitleName);
                 
                 row.append(jobTitle);  
                 
                 var email = document.createElement("td");
+                email.classList.add("email-cell");
                 var emailName = document.createTextNode(person.email || 'N/A');
                 email.append(emailName);
                 
@@ -345,24 +349,28 @@ $(document).ready(function() {
                 row.append(name);
     
                 var department = document.createElement("td");
+                department.classList.add("department-cell");
                 var departmentName = document.createTextNode(person.department || 'N/A');
                 department.append(departmentName);
                 
                 row.append(department);
     
                 var location = document.createElement("td");
+                location.classList.add("location-cell");
                 var locationName = document.createTextNode(person.location || 'N/A');
                 location.append(locationName);
                 
                 row.append(location);
     
                 var jobTitle = document.createElement("td");
+                jobTitle.classList.add("job-title-cell");
                 var jobTitleName = document.createTextNode(person.jobTitle || 'N/A');
                 jobTitle.append(jobTitleName);
                 
                 row.append(jobTitle);  
                 
                 var email = document.createElement("td");
+                email.classList.add("email-cell");
                 var emailName = document.createTextNode(person.email || 'N/A');
                 email.append(emailName);
                 
@@ -604,24 +612,28 @@ $(document).ready(function() {
               row.append(name);
   
               var department = document.createElement("td");
+              department.classList.add("department-cell");
               var departmentName = document.createTextNode(person.department || 'N/A');
               department.append(departmentName);
               
               row.append(department);
   
               var location = document.createElement("td");
+              location.classList.add("location-cell");
               var locationName = document.createTextNode(person.location || 'N/A');
               location.append(locationName);
               
               row.append(location);
   
               var jobTitle = document.createElement("td");
+              jobTitle.classList.add("job-title-cell");
               var jobTitleName = document.createTextNode(person.jobTitle || 'N/A');
               jobTitle.append(jobTitleName);
               
               row.append(jobTitle);  
               
               var email = document.createElement("td");
+              email.classList.add("email-cell");
               var emailName = document.createTextNode(person.email || 'N/A');
               email.append(emailName);
               
@@ -1060,24 +1072,28 @@ $(document).ready(function() {
               row.append(name);
 
               var department = document.createElement("td");
+              department.classList.add("department-cell");
               var departmentName = document.createTextNode(person.departmentName || 'N/A');
               department.append(departmentName);
             
               row.append(department);
 
               var location = document.createElement("td");
+              location.classList.add("location-cell");
               var locationName = document.createTextNode(person.location || 'N/A');
               location.append(locationName);
             
               row.append(location);
 
               var jobTitle = document.createElement("td");
+              jobTitle.classList.add("job-title-cell");
               var jobTitleName = document.createTextNode(person.jobTitle || 'N/A');
               jobTitle.append(jobTitleName);
             
               row.append(jobTitle);  
             
               var email = document.createElement("td");
+              email.classList.add("email-cell");
               var emailName = document.createTextNode(person.email || 'N/A');
               email.append(emailName);
             
@@ -1178,24 +1194,28 @@ $(document).ready(function() {
             row.append(name);
 
             var department = document.createElement("td");
+            department.classList.add("department-cell");
             var departmentName = document.createTextNode(person.department || 'N/A');
             department.append(departmentName);
             
             row.append(department);
 
             var location = document.createElement("td");
+            location.classList.add("location-cell");
             var locationName = document.createTextNode(person.location || 'N/A');
             location.append(locationName);
             
             row.append(location);
 
             var jobTitle = document.createElement("td");
+            jobTitle.classList.add("job-title-cell");
             var jobTitleName = document.createTextNode(person.jobTitle || 'N/A');
             jobTitle.append(jobTitleName);
             
             row.append(jobTitle);  
             
             var email = document.createElement("td");
+            email.classList.add("email-cell");
             var emailName = document.createTextNode(person.email || 'N/A');
             email.append(emailName);
             
@@ -1878,76 +1898,6 @@ $(document).ready(function() {
       }
     })
   });
-
-  /*DELETE LOCATIONS*/
-  $("#deleteLocationModal").on("show.bs.modal", function (e) {
-    $.ajax({
-      url:"http://localhost:8080/itcareerswitch/project2/libs/php/GET/getLocationByID.php",
-      type: "POST",
-      dataType: "json",
-      data: {
-        // Retrieve the data-id attribute from the calling button
-        // see https://getbootstrap.com/docs/5.0/components/modal/#varying-modal-content
-        // for the non-jQuery JavaScript alternative
-        id: $(e.relatedTarget).attr("data-id") 
-      },
-      success: function (result) {
-        var resultCode = result.status.code;
-
-        if (resultCode == 200) {
-          
-          // Update the hidden input with the employee id so that
-          // it can be referenced when the form is submitted
-          $("#deleteLocationID").val(result.data[0].id);
-
-          if(result.data.department_count > 0) {
-            $('#deleteLocationForm').html("<p>You cannot delete <strong>" + result.data[0].name + "</strong> from the location at this moment.</p><p>This location has <strong>" + result.data.department_count + " department(s)</strong> assigned to it.</p>");
-            $('.btn-submit-delete').prop("disabled", true); //disable the delete button
-          } else {
-            $('#deleteLocationForm').html("<p>Are you sure you want to delete the following location? </p>" + "<p><strong>" + result.data[0].name + "</strong></p>");
-            $(".btn-submit-delete").prop("disabled", false);
-          }
-          
-        } else {
-          $("#deleteLocationModal .modal-title").replaceWith(
-            "Error retrieving data"
-          );
-        }
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        $("#deleteLocationModal .modal-title").replaceWith(
-          "Error retrieving data"
-        );
-      }
-    });
-  })
-
-  // Executes when the form button with type="submit" is clicked
-  $("#deleteLocationForm").on("submit", function (event) {
-    event.preventDefault(); // Prevent the form submission (page reload)
-
-    const id = $('#deleteLocationID').val();
-
-    $.ajax({
-      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/DELETE/deleteLocationByID.php',
-      type: 'POST',
-      dataType: 'json',
-      data : {
-        id: id,
-      },
-      success: function(result) {
-        if (result.status.code === '200') {
-          //Close Modal
-          $('#deleteLocationModal').modal("hide");
-        }
-      },
-      error: function(xhr, status, error) {
-        console.error('Error loading data: ', error);
-        console.log("Response:", xhr.responseText);
-      }
-    })
-  });
-
 }); //document.ready
 
 //Check if department has employees and show modal
