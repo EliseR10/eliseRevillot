@@ -32,6 +32,32 @@ function checkDepartmentBeforeDelete(departmentId, departmentName) {
       console.log("Full Response: ", xhr.responseText);
     }
   })
+
+  // Executes when the form button with type="submit" is clicked
+  $("#deleteDepartmentForm").on("submit", function (event) {
+    event.preventDefault(); // Prevent the form submission (page reload)
+
+    const id = $('#deleteDepartmentID').val();
+
+    $.ajax({
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/DELETE/deleteDepartmentByID.php',
+      type: 'POST',
+      dataType: 'json',
+      data : {
+        id: id,
+      },
+      success: function(result) {
+        if (result.status.code === '200') {
+          //Close Modal
+          $('#deleteDepartmentModal').modal("hide");
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Error loading data: ', error);
+        console.log("Response:", xhr.responseText);
+      }
+    })
+  })
 }
 
 $(document).ready(function() {
