@@ -49,7 +49,65 @@ function checkDepartmentBeforeDelete(departmentId, departmentName) {
       success: function(result) {
         if (result.status.code === '200') {
           //Close Modal
-          $('#deleteDepartmentModal').modal("hide");
+          $('#areYouSureDeleteDepartmentModal').modal("hide");
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Error loading data: ', error);
+        console.log("Response:", xhr.responseText);
+      }
+    })
+  })
+}
+
+//Check if location has employees and show modal
+function checkLocationBeforeDelete(locationId, locationName) {
+  console.log("Location ID:", locationId);
+  console.log("Location Name: ", locationName);
+
+  $.ajax({
+    url: "http://localhost:8080/itcareerswitch/project2/libs/php/COUNT/countDepartment.php",
+    type: 'GET',
+    dataType: 'json',
+    data: {
+      id: locationId,
+    },
+    success: function (result) {
+      console.log(result);
+
+        if (result.data.location.department_count.department_count > 0) {
+          $('#cantDeleteLocName').text(locationName);
+          $('#departmentCount').text(result.data.location.department_count.department_count);
+          $('#cantDeleteLocationModal').modal('show');
+        } else {
+          $('#areYouSureLocName').text(locationName); // Set department name dynamically
+          $('#deleteLocationID').val(locationId); // Set department ID for deletion
+          $('#areYouSureDeleteLocationModal').modal('show');
+        }
+    },
+    error: function(xhr, status, error) {
+      console.error("Ajax Error: ", status, error);
+      console.log("Full Response: ", xhr.responseText);
+    }
+  })
+
+  // Executes when the form button with type="submit" is clicked
+  $("#deleteLocationForm").on("submit", function (event) {
+    event.preventDefault(); // Prevent the form submission (page reload)
+
+    const id = $('#deleteLocationID').val();
+
+    $.ajax({
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/DELETE/deleteLocationByID.php',
+      type: 'POST',
+      dataType: 'json',
+      data : {
+        id: id,
+      },
+      success: function(result) {
+        if (result.status.code === '200') {
+          //Close Modal
+          $('#areYouSureDeleteLocationModal').modal("hide");
         }
       },
       error: function(xhr, status, error) {
@@ -239,9 +297,8 @@ $(document).ready(function() {
                   // Create the Delete button
                   var deleteButton = document.createElement("button");
                   deleteButton.className = "btn btn-primary btn-sm";
-                  deleteButton.setAttribute("data-bs-toggle", "modal");
-                  deleteButton.setAttribute("data-bs-target", "#deleteDepartmentModal");
                   deleteButton.setAttribute("data-id", department.id);
+                  deleteButton.setAttribute("onclick", `checkDepartmentBeforeDelete(${department.id}, '${department.departmentName}')`);
 
                   // Add the Font Awesome icon inside the button
                   var deleteIcon = document.createElement("i");
@@ -330,9 +387,8 @@ $(document).ready(function() {
                   // Create the Delete button
                   var deleteButton = document.createElement("button");
                   deleteButton.className = "btn btn-primary btn-sm";
-                  deleteButton.setAttribute("data-bs-toggle", "modal");
-                  deleteButton.setAttribute("data-bs-target", "#deleteLocationModal");
                   deleteButton.setAttribute("data-id", location.id);
+                  deleteButton.setAttribute("onclick", `checkLocationBeforeDelete(${location.id}, '${location.name}')`);
       
                   // Add the Font Awesome icon inside the button
                   var deleteIcon = document.createElement("i");
@@ -520,9 +576,8 @@ $(document).ready(function() {
                 // Create the Delete button
                 var deleteButton = document.createElement("button");
                 deleteButton.className = "btn btn-primary btn-sm";
-                deleteButton.setAttribute("data-bs-toggle", "modal");
-                deleteButton.setAttribute("data-bs-target", "#deleteDepartmentModal");
                 deleteButton.setAttribute("data-id", department.id);
+                deleteButton.setAttribute("onclick", `checkDepartmentBeforeDelete(${department.id}, '${department.department}')`);
     
                 // Add the Font Awesome icon inside the button
                 var deleteIcon = document.createElement("i");
@@ -594,9 +649,8 @@ $(document).ready(function() {
               // Create the Delete button
               var deleteButton = document.createElement("button");
               deleteButton.className = "btn btn-primary btn-sm";
-              deleteButton.setAttribute("data-bs-toggle", "modal");
-              deleteButton.setAttribute("data-bs-target", "#deleteLocationModal");
               deleteButton.setAttribute("data-id", location.id);
+              deleteButton.setAttribute("onclick", `checkLocationBeforeDelete(${location.id}, '${location.location}')`);
   
               // Add the Font Awesome icon inside the button
               var deleteIcon = document.createElement("i");
@@ -787,9 +841,8 @@ $(document).ready(function() {
               // Create the Delete button
               var deleteButton = document.createElement("button");
               deleteButton.className = "btn btn-primary btn-sm";
-              deleteButton.setAttribute("data-bs-toggle", "modal");
-              deleteButton.setAttribute("data-bs-target", "#deleteDepartmentModal");
               deleteButton.setAttribute("data-id", department.id);
+              deleteButton.setAttribute("onclick", `checkDepartmentBeforeDelete(${department.id}, '${department.department}')`);
   
               // Add the Font Awesome icon inside the button
               var deleteIcon = document.createElement("i");
@@ -870,9 +923,8 @@ $(document).ready(function() {
               // Create the Delete button
               var deleteButton = document.createElement("button");
               deleteButton.className = "btn btn-primary btn-sm";
-              deleteButton.setAttribute("data-bs-toggle", "modal");
-              deleteButton.setAttribute("data-bs-target", "#deleteLocationModal");
               deleteButton.setAttribute("data-id", location.id);
+              deleteButton.setAttribute("onclick", `checkLocationBeforeDelete(${location.id}, '${location.location}')`);
   
               // Add the Font Awesome icon inside the button
               var deleteIcon = document.createElement("i");
@@ -1446,9 +1498,8 @@ $(document).ready(function() {
             // Create the Delete button
             var deleteButton = document.createElement("button");
             deleteButton.className = "btn btn-primary btn-sm";
-            deleteButton.setAttribute("data-bs-toggle", "modal");
-            deleteButton.setAttribute("data-bs-target", "#deleteLocationModal");
             deleteButton.setAttribute("data-id", location.id);
+            deleteButton.setAttribute("onclick", `checkLocationBeforeDelete(${location.id}, '${location.location}')`);
 
             // Add the Font Awesome icon inside the button
             var deleteIcon = document.createElement("i");
@@ -1952,7 +2003,7 @@ $(document).ready(function() {
     })
   });
 
-  /*DELETE DEPARTMENTS*/
+  /*DELETE DEPARTMENTS
   $("#deleteDepartmentModal").on("show.bs.modal", function (e) {
     $.ajax({
       url:"http://localhost:8080/itcareerswitch/project2/libs/php/GET/getDepartmentByID.php",
@@ -2019,7 +2070,7 @@ $(document).ready(function() {
         console.log("Response:", xhr.responseText);
       }
     })
-  });
+  });*/
 
   /*DELETE LOCATIONS*/
   $("#deleteLocationModal").on("show.bs.modal", function (e) {
