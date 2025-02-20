@@ -287,7 +287,7 @@ $(document).ready(function() {
                   editButton.className = "btn btn-primary btn-sm editBtn";
                   editButton.setAttribute("data-bs-toggle", "modal");
                   editButton.setAttribute("data-bs-target", "#editDepartmentModal");
-                  editButton.setAttribute("data-id", department.id);
+                  editButton.setAttribute("data-id", department.departmentID);
 
                   // Add the Font Awesome icon inside the button
                   var editIcon = document.createElement("i");
@@ -298,7 +298,7 @@ $(document).ready(function() {
                   var deleteButton = document.createElement("button");
                   deleteButton.className = "btn btn-primary btn-sm";
                   deleteButton.setAttribute("data-id", department.id);
-                  deleteButton.setAttribute("onclick", `checkDepartmentBeforeDelete(${department.id}, '${department.departmentName}')`);
+                  deleteButton.setAttribute("onclick", `checkDepartmentBeforeDelete(${department.departmentID}, '${department.departmentName}')`);
 
                   // Add the Font Awesome icon inside the button
                   var deleteIcon = document.createElement("i");
@@ -439,6 +439,9 @@ $(document).ready(function() {
           dataType: 'json',
           success: function (result) {
             if (result.status.code === '200')  {
+              const $personnelTableBody = $('#personnelTableBody');
+              $personnelTableBody.empty(); //clear the table before displaying new results
+
               const personnelData = result.data;
               var frag = document.createDocumentFragment();
              
@@ -534,7 +537,9 @@ $(document).ready(function() {
           type: 'GET',
           dataType: 'json',
           success: function (result) {
-    
+            const $departmentTableBody = $('#departmentTableBody');
+            $departmentTableBody.empty(); //clear the table before displaying new results
+
             if (result.status.code === '200')  {
                 const departmentData = result.data;
                 var frag = document.createDocumentFragment();
@@ -612,6 +617,8 @@ $(document).ready(function() {
           type: 'GET',
           dataType: 'json',
           success: function (result) {
+            const $locationTableBody = $('#locationTableBody');
+            $locationTableBody.empty(); //clear the table before displaying new results
   
             if (result.status.code === '200')  {
               const locationData = result.data;
@@ -1795,6 +1802,7 @@ $(document).ready(function() {
 
   /*MODIFY DEPARTMENT*/
   $("#editDepartmentModal").on("show.bs.modal", function (e) {
+    console.log($(e.relatedTarget).attr("data-id"));
 
     $.ajax({
       url:"http://localhost:8080/itcareerswitch/project2/libs/php/GET/getDepartmentByID.php",
@@ -1808,9 +1816,10 @@ $(document).ready(function() {
       },
       success: function (result) {
         var resultCode = result.status.code;
+        console.log(result);
 
         if (resultCode == 200) {
-          
+
           // Update the hidden input with the employee id so that
           // it can be referenced when the form is submitted
   
