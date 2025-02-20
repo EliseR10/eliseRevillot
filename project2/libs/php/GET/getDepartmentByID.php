@@ -96,35 +96,6 @@
 
 	}
 
-	/*third query - 
-	$query = $conn->prepare('SELECT COUNT(*) AS employee_count FROM personnel WHERE departmentID =  ?');
-
-	$query->bind_param("i", $_REQUEST['id']);
-
-	$query->execute();
-	
-	if (false === $query) {
-
-		$output['status']['code'] = "400";
-		$output['status']['name'] = "executed";
-		$output['status']['description'] = "query failed";	
-		$output['data'] = [];
-
-		echo json_encode($output); 
-	
-		mysqli_close($conn);
-		exit;
-
-	}
-
-	$result = $query->get_result();
-
-	//Fetch employee count
-	$employeeCount = $result->fetch_assoc();
-
-	//Add employee count to department data
-	$department['employee_count'] = $employeeCount['employee_count'];*/
-
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
 	$output['status']['description'] = "success";

@@ -2,122 +2,6 @@ $(window).on('load', function() {
   $('#preloader').fadeOut('slow'); // Use fadeOut for smooth transition
 });
 
-//Check if department has employees and show modal
-function checkDepartmentBeforeDelete(departmentId, departmentName) {
-  console.log("Department ID:", departmentId);
-  console.log("Department Name: ", departmentName);
-
-  $.ajax({
-    url: "http://localhost:8080/itcareerswitch/project2/libs/php/COUNT/countPersonnel.php",
-    type: 'GET',
-    dataType: 'json',
-    data: {
-      id: departmentId,
-    },
-    success: function (result) {
-      console.log(result);
-
-        if (result.data.department.employee_count.employee_count > 0) {
-          $('#cantDeleteDeptName').text(departmentName);
-          $('#personnelCount').text(result.data.department.employee_count.employee_count);
-          $('#cantDeleteDepartmentModal').modal('show');
-        } else {
-          $('#areYouSureDeptName').text(departmentName); // Set department name dynamically
-          $('#deleteDepartmentID').val(departmentId); // Set department ID for deletion
-          $('#areYouSureDeleteDepartmentModal').modal('show');
-        }
-    },
-    error: function(xhr, status, error) {
-      console.error("Ajax Error: ", status, error);
-      console.log("Full Response: ", xhr.responseText);
-    }
-  })
-
-  // Executes when the form button with type="submit" is clicked
-  $("#deleteDepartmentForm").on("submit", function (event) {
-    event.preventDefault(); // Prevent the form submission (page reload)
-
-    const id = $('#deleteDepartmentID').val();
-
-    $.ajax({
-      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/DELETE/deleteDepartmentByID.php',
-      type: 'POST',
-      dataType: 'json',
-      data : {
-        id: id,
-      },
-      success: function(result) {
-        if (result.status.code === '200') {
-          //Close Modal
-          $('#areYouSureDeleteDepartmentModal').modal("hide");
-        }
-      },
-      error: function(xhr, status, error) {
-        console.error('Error loading data: ', error);
-        console.log("Response:", xhr.responseText);
-      }
-    })
-  })
-}
-
-//Check if location has employees and show modal
-function checkLocationBeforeDelete(locationId, locationName) {
-  console.log("Location ID:", locationId);
-  console.log("Location Name: ", locationName);
-
-  $.ajax({
-    url: "http://localhost:8080/itcareerswitch/project2/libs/php/COUNT/countDepartment.php",
-    type: 'GET',
-    dataType: 'json',
-    data: {
-      id: locationId,
-    },
-    success: function (result) {
-      console.log(result);
-
-        if (result.data.location.department_count.department_count > 0) {
-          $('#cantDeleteLocName').text(locationName);
-          $('#departmentCount').text(result.data.location.department_count.department_count);
-          $('#cantDeleteLocationModal').modal('show');
-        } else {
-          $('#areYouSureLocName').text(locationName); // Set department name dynamically
-          $('#deleteLocationID').val(locationId); // Set department ID for deletion
-          $('#areYouSureDeleteLocationModal').modal('show');
-        }
-    },
-    error: function(xhr, status, error) {
-      console.error("Ajax Error: ", status, error);
-      console.log("Full Response: ", xhr.responseText);
-    }
-  })
-
-  // Executes when the form button with type="submit" is clicked
-  $("#deleteLocationForm").on("submit", function (event) {
-    event.preventDefault(); // Prevent the form submission (page reload)
-
-    const id = $('#deleteLocationID').val();
-
-    $.ajax({
-      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/DELETE/deleteLocationByID.php',
-      type: 'POST',
-      dataType: 'json',
-      data : {
-        id: id,
-      },
-      success: function(result) {
-        if (result.status.code === '200') {
-          //Close Modal
-          $('#areYouSureDeleteLocationModal').modal("hide");
-        }
-      },
-      error: function(xhr, status, error) {
-        console.error('Error loading data: ', error);
-        console.log("Response:", xhr.responseText);
-      }
-    })
-  })
-}
-
 $(document).ready(function() {
   /*SEARCH BAR FOR PERSONNEL*/
   $("#searchInp").on("keyup", function () {
@@ -134,7 +18,6 @@ $(document).ready(function() {
           success: function (result) {
 
             if (result.status.code === '200')  {
-              console.log(result);
               let resultsArray = result.data.found;
 
               const $personnelTableBody = $('#personnelTableBody');
@@ -1146,8 +1029,6 @@ $(document).ready(function() {
       filteredParams.locationID = locationID;
     }
 
-    console.log('The filtered params are: ', filteredParams);
-
       $.ajax({
         url: 'http://localhost:8080/itcareerswitch/project2/libs/php/FILTER/filterPersonnel.php',
         type: 'GET',
@@ -1161,7 +1042,6 @@ $(document).ready(function() {
           var frag = document.createDocumentFragment();
 
           if (result.status.code === '200' && result.data.length > 0)  {
-            console.log(result.data);
 
             personnelData.forEach(person => {
               var row = document.createElement("tr");
@@ -1367,10 +1247,7 @@ $(document).ready(function() {
     }
     })
   }
-
   displayPersonnel();
-
-  
 
   /*DISPLAY DEPARTMENT DATA*/
   function displayDepartment() {
@@ -1418,13 +1295,6 @@ $(document).ready(function() {
             editIcon.className = "fa-solid fa-pencil fa-fw";
             editButton.append(editIcon);
 
-            /*Create the Delete button
-            var deleteButton = document.createElement("button");
-            deleteButton.className = "btn btn-primary btn-sm";
-            deleteButton.setAttribute("data-bs-toggle", "modal");
-            deleteButton.setAttribute("data-bs-target", "#deleteDepartmentModal");
-            deleteButton.setAttribute("data-id", department.id);*/
-
             // Create the Delete button
             var deleteButton = document.createElement("button");
             deleteButton.className = "btn btn-primary btn-sm";
@@ -1458,7 +1328,6 @@ $(document).ready(function() {
       }
     })
   }
-  //displayDepartment();
 
 
     /*DISPLAY LOCATION DATA*/
@@ -1533,7 +1402,6 @@ $(document).ready(function() {
       }
     })
   }
-  //displayLocation();
 
   /*ADD PERSONNEL*/
   /*Populate department selection in addPersonnelModal*/
@@ -1802,7 +1670,6 @@ $(document).ready(function() {
 
   /*MODIFY DEPARTMENT*/
   $("#editDepartmentModal").on("show.bs.modal", function (e) {
-    console.log($(e.relatedTarget).attr("data-id"));
 
     $.ajax({
       url:"http://localhost:8080/itcareerswitch/project2/libs/php/GET/getDepartmentByID.php",
@@ -2012,75 +1879,6 @@ $(document).ready(function() {
     })
   });
 
-  /*DELETE DEPARTMENTS
-  $("#deleteDepartmentModal").on("show.bs.modal", function (e) {
-    $.ajax({
-      url:"http://localhost:8080/itcareerswitch/project2/libs/php/GET/getDepartmentByID.php",
-      type: "POST",
-      dataType: "json",
-      data: {
-        // Retrieve the data-id attribute from the calling button
-        // see https://getbootstrap.com/docs/5.0/components/modal/#varying-modal-content
-        // for the non-jQuery JavaScript alternative
-        id: $(e.relatedTarget).attr("data-id") 
-      },
-      success: function (result) {
-        var resultCode = result.status.code;
-
-        if (resultCode == 200) {
-          
-          // Update the hidden input with the employee id so that
-          // it can be referenced when the form is submitted
-          $("#deleteDepartmentID").val(result.data.department[0].department_id);
-
-          if(result.data.department.employee_count > 0) {
-            $('#deleteDepartmentForm').html("<p>You cannot delete <strong>" + result.data.department[0].department_name + "</strong> from the departments at this moment.</p><p>This department has <strong>" + result.data.department.employee_count + " employee(s)</strong> assigned to it.</p>");
-            $('.btn-submit-delete').prop("disabled", true); //disable the delete button
-          } else {
-            $('#deleteDepartmentForm').html("<p>Are you sure you want to delete the following department? </p>" + "<p><strong>" + result.data.department[0].department_name + "</strong></p>");
-            $(".btn-submit-delete").prop("disabled", false);
-          }
-
-        } else {
-          $("#deleteDepartmentModal .modal-title").replaceWith(
-            "Error retrieving data"
-          );
-        }
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        $("#deleteDepartmentModal .modal-title").replaceWith(
-          "Error retrieving data"
-        );
-      }
-    });
-  })
-
-  // Executes when the form button with type="submit" is clicked
-  $("#deleteDepartmentForm").on("submit", function (event) {
-    event.preventDefault(); // Prevent the form submission (page reload)
-
-    const id = $('#deleteDepartmentID').val();
-
-    $.ajax({
-      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/DELETE/deleteDepartmentByID.php',
-      type: 'POST',
-      dataType: 'json',
-      data : {
-        id: id,
-      },
-      success: function(result) {
-        if (result.status.code === '200') {
-          //Close Modal
-          $('#deleteDepartmentModal').modal("hide");
-        }
-      },
-      error: function(xhr, status, error) {
-        console.error('Error loading data: ', error);
-        console.log("Response:", xhr.responseText);
-      }
-    })
-  });*/
-
   /*DELETE LOCATIONS*/
   $("#deleteLocationModal").on("show.bs.modal", function (e) {
     $.ajax({
@@ -2151,3 +1949,113 @@ $(document).ready(function() {
   });
 
 }); //document.ready
+
+//Check if department has employees and show modal
+function checkDepartmentBeforeDelete(departmentId, departmentName) {
+
+  $.ajax({
+    url: "http://localhost:8080/itcareerswitch/project2/libs/php/COUNT/countPersonnel.php",
+    type: 'GET',
+    dataType: 'json',
+    data: {
+      id: departmentId,
+    },
+    success: function (result) {
+
+        if (result.data.department.employee_count.employee_count > 0) {
+          $('#cantDeleteDeptName').text(departmentName);
+          $('#personnelCount').text(result.data.department.employee_count.employee_count);
+          $('#cantDeleteDepartmentModal').modal('show');
+        } else {
+          $('#areYouSureDeptName').text(departmentName); // Set department name dynamically
+          $('#deleteDepartmentID').val(departmentId); // Set department ID for deletion
+          $('#areYouSureDeleteDepartmentModal').modal('show');
+        }
+    },
+    error: function(xhr, status, error) {
+      console.error("Ajax Error: ", status, error);
+      console.log("Full Response: ", xhr.responseText);
+    }
+  })
+
+  // Executes when the form button with type="submit" is clicked
+  $("#deleteDepartmentForm").on("submit", function (event) {
+    event.preventDefault(); // Prevent the form submission (page reload)
+
+    const id = $('#deleteDepartmentID').val();
+
+    $.ajax({
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/DELETE/deleteDepartmentByID.php',
+      type: 'POST',
+      dataType: 'json',
+      data : {
+        id: id,
+      },
+      success: function(result) {
+        if (result.status.code === '200') {
+          //Close Modal
+          $('#areYouSureDeleteDepartmentModal').modal("hide");
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Error loading data: ', error);
+        console.log("Response:", xhr.responseText);
+      }
+    })
+  })
+}
+
+//Check if location has employees and show modal
+function checkLocationBeforeDelete(locationId, locationName) {
+
+  $.ajax({
+    url: "http://localhost:8080/itcareerswitch/project2/libs/php/COUNT/countDepartment.php",
+    type: 'GET',
+    dataType: 'json',
+    data: {
+      id: locationId,
+    },
+    success: function (result) {
+
+        if (result.data.location.department_count.department_count > 0) {
+          $('#cantDeleteLocName').text(locationName);
+          $('#departmentCount').text(result.data.location.department_count.department_count);
+          $('#cantDeleteLocationModal').modal('show');
+        } else {
+          $('#areYouSureLocName').text(locationName); // Set department name dynamically
+          $('#deleteLocationID').val(locationId); // Set department ID for deletion
+          $('#areYouSureDeleteLocationModal').modal('show');
+        }
+    },
+    error: function(xhr, status, error) {
+      console.error("Ajax Error: ", status, error);
+      console.log("Full Response: ", xhr.responseText);
+    }
+  })
+
+  // Executes when the form button with type="submit" is clicked
+  $("#deleteLocationForm").on("submit", function (event) {
+    event.preventDefault(); // Prevent the form submission (page reload)
+
+    const id = $('#deleteLocationID').val();
+
+    $.ajax({
+      url: 'http://localhost:8080/itcareerswitch/project2/libs/php/DELETE/deleteLocationByID.php',
+      type: 'POST',
+      dataType: 'json',
+      data : {
+        id: id,
+      },
+      success: function(result) {
+        if (result.status.code === '200') {
+          //Close Modal
+          $('#areYouSureDeleteLocationModal').modal("hide");
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Error loading data: ', error);
+        console.log("Response:", xhr.responseText);
+      }
+    })
+  })
+}
