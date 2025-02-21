@@ -946,6 +946,14 @@ $(document).ready(function() {
   /*Personnel Filter Button*/
   $('#filterEmployeeModal').on('show.bs.modal', function() {
     /*Populate location selection in filterDepartmentModal*/
+
+    const $currentFilterDepartmentSelect = $('#filterEmployeeDepartment').val();
+    const $currentFilterLocationSelect = $('#filterEmployeeLocation').val();
+
+    // Clear the select options before repopulating
+    $('#filterEmployeeDepartment').empty();
+    $('#filterEmployeeLocation').empty();
+
     $.ajax({
       url: "http://localhost:8080/itcareerswitch/project2/libs/php/GET/getAllDepartments.php",
       type: 'GET',
@@ -968,7 +976,7 @@ $(document).ready(function() {
             );
           });
 
-          $("#filterEmployeeDepartment").val('all');
+          $("#filterEmployeeDepartment").val($currentFilterDepartmentSelect || 'all');
         
         } else {
           $("#filterEmployeeModal .modal-title").replaceWith(
@@ -1001,7 +1009,7 @@ $(document).ready(function() {
             );
           });
 
-          $("#filterEmployeeLocation").val('all');
+          $("#filterEmployeeLocation").val($currentFilterLocationSelect || 'all');
         
         } else {
           $("#filterEmployeeModal .modal-title").replaceWith(
@@ -1016,20 +1024,19 @@ $(document).ready(function() {
       if ($(this).val() !== 'all') {
         $('#filterEmployeeLocation').val('all');
       }
+      fetchFilteredEmployees();
     });
 
     $('#filterEmployeeLocation').on('change', function() {
       if ($(this).val() !== 'all') {
         $('#filterEmployeeDepartment').val('all');
       }
+      fetchFilteredEmployees();
     });
 
   })
 
-  //Set the filters
-  $('#filterEmployeeForm').on('submit', function(event) {
-    event.preventDefault(); // Prevent the form submission (page reload)
-
+  function fetchFilteredEmployees() {
     const departmentID = $('#filterEmployeeDepartment').val();
     const locationID = $('#filterEmployeeLocation').val();
 
@@ -1164,7 +1171,7 @@ $(document).ready(function() {
           }
         }
       })
-  })
+  }
 
   /*DISPLAY EMPLOYEE DATA*/
   function displayPersonnel() {
